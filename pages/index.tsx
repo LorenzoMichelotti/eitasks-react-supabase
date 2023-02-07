@@ -16,12 +16,11 @@ interface Task {
 const taskCardVariants = {
   initial: { opacity: 0, y: -20, scaleY: 0.75 },
   idle: { opacity: 1, y: 0, scaleY: 1 },
-  hovered: { opacity: 1, y: 0, scaleY: 1 },
   completed: {
     opacity: 1,
     scaleX: 1.2,
     scaleY: 1.2,
-    rotateX: [null, 360],
+    rotateX: 360,
     transition: { duration: 0.5 },
   },
   exit: (param: number) => ({
@@ -227,7 +226,7 @@ export default function Home() {
               {tasks.map((task) => (
                 <Reorder.Item
                   variants={taskCardVariants}
-                  custom={task.completed ? 1 : -1}
+                  custom={task.completed || false ? 1 : -1}
                   initial={"initial"}
                   animate={task.completed ? "completed" : "idle"}
                   whileHover={"hovered"}
