@@ -99,10 +99,10 @@ export default function Home() {
     }, 1000);
   }
 
-  function updateTask(taskId: number, progressChange: number) {
+  function updateTask(e: MouseEvent, taskId: number, progressChange: number) {
     const newTasks = tasks.map((task) => {
       if (task.id === taskId) {
-        progressChange = event.shiftKey ? progressChange : progressChange * 2;
+        progressChange = e.shiftKey ? progressChange : progressChange * 2;
         const newProgress = Math.ceil((task.progress + progressChange) / 5) * 5;
         if (newProgress >= 100) task.progress = 100;
         else if (newProgress <= 0) task.progress = 0;
@@ -272,7 +272,9 @@ export default function Home() {
                   {!task.completed && (
                     <motion.button
                       variants={taskCardButtonVariants}
-                      onClick={(e) => updateTask(task.id, -5)}
+                      onClick={(e) =>
+                        updateTask(e as unknown as MouseEvent, task.id, -5)
+                      }
                       className="absolute -left-12 top-1/2 -translate-y-1/2 active:scale-95 rounded-xl w-8 h-8 border-2 border-white-500 opacity-50 hover:opacity-100 transition-all flex items-center justify-center"
                     >
                       <Image
@@ -286,7 +288,9 @@ export default function Home() {
                   {!task.completed && (
                     <motion.button
                       variants={taskCardButtonVariants}
-                      onClick={(e) => updateTask(task.id, 5)}
+                      onClick={(e) =>
+                        updateTask(e as unknown as MouseEvent, task.id, 5)
+                      }
                       className="absolute -right-12 top-1/2 -translate-y-1/2 active:scale-95 rounded-xl w-8 h-8 border-2 border-white-500 opacity-50 hover:opacity-100 transition-all flex items-center justify-center"
                     >
                       <Image
