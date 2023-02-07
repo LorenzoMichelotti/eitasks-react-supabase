@@ -170,6 +170,12 @@ export default function Home() {
           <div className="absolute right-24 font-semibold top-12 text-teal-500">
             {completedTasks.length} / {tasks.length + completedTasks.length}
           </div>
+          <a
+            href="https://www.linkedin.com/in/lorenzo-michelotti-b1b4441a7/"
+            className="absolute opacity-25 hover:opacity-100 transition-opacity left-24 font-semibold top-12 text-teal-500"
+          >
+            tasks by @lolo
+          </a>
           <div
             className="w-full focus-within:scale-105 transition-transform h-56 flex space-x-2"
             id="task_form_container"
