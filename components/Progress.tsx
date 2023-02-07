@@ -25,8 +25,9 @@ export default function Progress({ value }: { value: number }) {
   }
 
   useEffect(() => {
+    if (!progressBarRef.current) return;
     x.set(scale(Number(value), 0, 100, 0, progressBarRef.current?.offsetWidth));
-  }, [value]);
+  }, [value, progressBarRef]);
 
   return (
     <motion.div

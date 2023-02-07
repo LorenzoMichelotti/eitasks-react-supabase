@@ -17,12 +17,6 @@ const taskCardVariants = {
   initial: { opacity: 0, y: -20, scaleY: 0.75 },
   idle: { opacity: 1, y: 0, scaleY: 1 },
   hovered: { opacity: 1, y: 0, scaleY: 1 },
-  exit: (param: number) => ({
-    opacity: 0,
-    x: 300 * param,
-    y: 50,
-    rotate: 25 * param,
-  }),
   completed: {
     opacity: 1,
     scaleX: 1.2,
@@ -30,6 +24,12 @@ const taskCardVariants = {
     rotateX: [null, 360],
     transition: { duration: 0.5 },
   },
+  exit: (param: number) => ({
+    opacity: 0,
+    x: 300 * param,
+    y: 50,
+    rotate: 25 * param,
+  }),
 };
 
 const taskCardButtonVariants = {
@@ -99,10 +99,10 @@ export default function Home() {
     }, 1000);
   }
 
-  function updateTask(e: MouseEvent, taskId: number, progressChange: number) {
+  function updateTask(taskId: number, progressChange: number) {
     const newTasks = tasks.map((task) => {
       if (task.id === taskId) {
-        progressChange = e.shiftKey ? progressChange : progressChange * 2;
+        progressChange = event.shiftKey ? progressChange : progressChange * 2;
         const newProgress = Math.ceil((task.progress + progressChange) / 5) * 5;
         if (newProgress >= 100) task.progress = 100;
         else if (newProgress <= 0) task.progress = 0;
@@ -272,7 +272,7 @@ export default function Home() {
                   {!task.completed && (
                     <motion.button
                       variants={taskCardButtonVariants}
-                      onClick={(e) => updateTask(e, task.id, -5)}
+                      onClick={(e) => updateTask(task.id, -5)}
                       className="absolute -left-12 top-1/2 -translate-y-1/2 active:scale-95 rounded-xl w-8 h-8 border-2 border-white-500 opacity-50 hover:opacity-100 transition-all flex items-center justify-center"
                     >
                       <Image
@@ -286,7 +286,7 @@ export default function Home() {
                   {!task.completed && (
                     <motion.button
                       variants={taskCardButtonVariants}
-                      onClick={(e) => updateTask(e, task.id, 5)}
+                      onClick={(e) => updateTask(task.id, 5)}
                       className="absolute -right-12 top-1/2 -translate-y-1/2 active:scale-95 rounded-xl w-8 h-8 border-2 border-white-500 opacity-50 hover:opacity-100 transition-all flex items-center justify-center"
                     >
                       <Image

@@ -28,9 +28,9 @@ export default function Slider({
     x,
     [
       16,
-      (progressBarRef.current?.offsetWidth - 16) * 0.45,
-      (progressBarRef.current?.offsetWidth - 16) * 0.75,
-      progressBarRef.current?.offsetWidth - 16,
+      ((progressBarRef.current?.offsetWidth || 0) - 16) * 0.45,
+      ((progressBarRef.current?.offsetWidth || 0) - 16) * 0.75,
+      (progressBarRef.current?.offsetWidth || 0) - 16,
     ],
     ["#ec4899", "#facc15", "#0ea5e9", "#34d399"]
   );
@@ -56,7 +56,7 @@ export default function Slider({
     let newValue = scale(
       latest,
       16,
-      progressBarRef.current?.offsetWidth - 16,
+      (progressBarRef.current?.offsetWidth || 0) - 16,
       0,
       100
     );
@@ -82,7 +82,13 @@ export default function Slider({
 
   useEffect(() => {
     x.set(
-      scale(Number(value), 0, 100, 16, progressBarRef.current?.offsetWidth - 16)
+      scale(
+        Number(value),
+        0,
+        100,
+        16,
+        (progressBarRef.current?.offsetWidth || 0) - 16
+      )
     );
   }, [value]);
 
@@ -130,7 +136,7 @@ export default function Slider({
                 0,
                 100,
                 16,
-                progressBarRef.current?.offsetWidth - 16
+                (progressBarRef.current?.offsetWidth || 0) - 16
               )
             );
           }}
