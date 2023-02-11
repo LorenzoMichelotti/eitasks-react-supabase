@@ -59,10 +59,16 @@ export default function Slider({
     window.addEventListener("mouseup", (event: any) => {
       setDragging(false);
     });
+    window.addEventListener("touchend", (event: any) => {
+      setDragging(false);
+    });
     return () =>
       window.removeEventListener("mouseup", (event: any) => {
         setDragging(false);
       });
+    window.removeEventListener("touchend", (event: any) => {
+      setDragging(false);
+    });
   }, []);
 
   useEffect(() => {
