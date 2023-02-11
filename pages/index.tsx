@@ -61,7 +61,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="w-11/12 md:w-1/2 2xl:w-1/4 mx-auto my-24 ">
+      <main className="w-11/12 md:w-1/2 2xl:w-1/4 mx-auto my-4 md:my-24 ">
         <Header
           completedTaskCount={completedTasks.length}
           taskCount={tasks.length}
@@ -91,7 +91,7 @@ export default function Home() {
                 drag="y"
                 layout
                 key={task.id}
-                className={`w-full relative bg-[#1B1B22] h-fit rounded-2xl p-2 md:p-4 shadow-xl`} //task
+                className={`w-full relative bg-white dark:bg-[#1B1B22] h-fit rounded-2xl p-2 md:p-4 shadow-xl`} //task
               >
                 <TaskCard
                   save={save}

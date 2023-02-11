@@ -80,7 +80,7 @@ export default function Slider({
       <motion.div
         layout
         ref={progressBarRef}
-        className="cursor-pointer relative bg-black/50 w-full rounded-full h-4 group"
+        className="cursor-pointer relative bg-slate-200 dark:bg-black/50 w-full rounded-full h-4 group"
       >
         <motion.div
           draggable={false}
@@ -114,7 +114,7 @@ export default function Slider({
             className={`${
               autoHideInput &&
               "opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity"
-            } bg-white cursor-pointer shadow-2xl absolute -left-4 w-8 h-8 rounded-full`}
+            } bg-white cursor-pointer shadow-md border-2 dark:border-none absolute -left-4 w-8 h-8 rounded-full`}
           ></motion.div>
         </motion.div>
       </motion.div>
@@ -155,7 +155,7 @@ export default function Slider({
           }
           value={value.toString()}
           type={"text"}
-          className=" bg-black/50 w-full rounded-lg p-0 sm:p-1 md:p-2 text-center"
+          className="bg-white border-2 dark:border-none dark:bg-black/50 w-full rounded-lg p-0 sm:p-1 md:p-2 text-center"
         />
         <span className="hidden sm:flex pointer-events-none select-none">
           %

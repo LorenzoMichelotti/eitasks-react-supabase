@@ -43,7 +43,7 @@ export default function TaskForm({
       id="task_form_container"
     >
       <div
-        className="w-11/12 h-full bg-[#1B1B22] shadow-xl p-4 rounded-l-2xl rounded-r-md"
+        className="w-10/12 h-full bg-white dark:bg-[#1B1B22] shadow-xl p-4 rounded-l-2xl rounded-r-md"
         id="task_form"
       >
         <textarea
@@ -59,7 +59,7 @@ export default function TaskForm({
             !e.shiftKey &&
             createTask(description, progress)
           }
-          className="text-white py-2 px-4 text-[20px] resize-none w-full h-4/6 bg-[#151517] rounded-xl"
+          className="text-slate-900 dark:text-white py-2 px-4 text-[20px] resize-none w-full h-4/6 bg-white border-2 dark:border-none dark:bg-[#151517] rounded-xl"
         ></textarea>
         <Slider
           value={progress}
@@ -78,13 +78,14 @@ export default function TaskForm({
           scale: 0.95,
           transition: { duration: 0.2, type: "spring" },
         }}
-        className="bg-[#3C435C] w-1/12 rounded-r-2xl rounded-l-md shadow-xl flex justify-center items-center"
+        className="bg-sky-600 dark:bg-[#3C435C] w-2/12 rounded-r-2xl rounded-l-md shadow-xl flex justify-center items-center"
       >
         <Image
-          src={"/plus_icon2.svg"}
+          src={"/plus_icon_light.svg"}
           width={24}
           height={24}
           alt="plus icon"
+          className="dark:opacity-50"
         ></Image>
       </motion.button>
     </div>

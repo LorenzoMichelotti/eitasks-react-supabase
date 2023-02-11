@@ -8,16 +8,10 @@ export default function Header({
   completedTaskCount: number;
 }) {
   return (
-    <div>
-      <div className="absolute right-24 font-semibold top-12 text-teal-500">
-        {completedTaskCount} / {taskCount + completedTaskCount}
+    <div className="flex flex-col justify-between mb-4">
+      <div className="top-12 ml-auto opacity-50 text-black dark:text-white">
+        {completedTaskCount} / {taskCount + completedTaskCount} completed tasks
       </div>
-      <a
-        href="https://www.linkedin.com/in/lorenzo-michelotti-b1b4441a7/"
-        className="absolute opacity-25 hover:opacity-100 transition-opacity left-24 font-semibold top-12 text-teal-500"
-      >
-        tasks by @lolo
-      </a>
     </div>
   );
 }
