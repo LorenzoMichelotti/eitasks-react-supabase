@@ -4,4 +4,5 @@ export default interface Task {
   progress: number;
   created: string;
   completed?: boolean;
+  subtasks?: Task[];
 }

@@ -82,53 +82,80 @@ export default function TaskCard({
   }, [progress]);
 
   return (
-    <div className="w-full h-full group">
-      <p className="text-lg text-slate-900 dark:text-white px-2">
-        {task.description}
-      </p>
-      <Slider value={progress} setValue={setProgress} />
-      {!task.completed && (
-        <motion.button
-          onClick={() => deleteTask(task.id)}
-          className="absolute -left-10 md:-left-1/4 top-1/2 opacity-100 dark:opacity-50 md:opacity-0 md:group-hover:opacity-100 md:active:opacity-100 -translate-y-1/2 active:scale-95 active:opacity-100 rounded-xl w-8 h-full md:w-16 md:h-16 bg-pink-600 dark:bg-transparent dark:border-2 border-pink-500  transition-all flex items-center justify-center"
-        >
-          <Image
-            src={"/plus_icon2.svg"}
-            width={20}
-            height={20}
-            alt="plus icon"
-            className="rotate-45 hidden dark:flex"
-          ></Image>
-          <Image
-            src={"/plus_icon_light.svg"}
-            width={20}
-            height={20}
-            alt="plus icon"
-            className="rotate-45 flex dark:hidden"
-          ></Image>
-        </motion.button>
-      )}
-      {!task.completed && (
-        <motion.button
-          onClick={() => completeTask(task.id)}
-          className="absolute -right-10 md:-right-1/4 top-1/2 opacity-100 dark:opacity-50 md:opacity-0 md:group-hover:opacity-100 md:active:opacity-100 -translate-y-1/2 active:scale-95 active:opacity-100 rounded-xl w-8 h-full md:w-16 md:h-16 bg-teal-600 dark:bg-transparent dark:border-2  border-teal-500 transition-all flex items-center justify-center"
-        >
-          <Image
-            src={"/check.svg"}
-            width={24}
-            height={24}
-            alt="plus icon"
-            className="hidden dark:flex"
-          ></Image>
-          <Image
-            src={"/check_light.svg"}
-            width={24}
-            height={24}
-            alt="plus icon"
-            className="flex dark:hidden"
-          ></Image>
-        </motion.button>
-      )}
+    <div className="w-full h-full flex space-x-2 group justify-start items-center">
+      <div className="flex flex-col h-full">
+        {!task.completed && (
+          <motion.button
+            onClick={() => deleteTask(task.id)}
+            className="opacity-100 dark:opacity-50 md:opacity-0 md:group-hover:opacity-100 md:active:opacity-100 active:scale-95 active:opacity-100 rounded-xl w-8 h-8 bg-pink-600 dark:bg-transparent dark:border-2 border-pink-500  transition-all flex items-center justify-center"
+          >
+            <Image
+              src={"/plus_icon2.svg"}
+              width={20}
+              height={20}
+              alt="plus icon"
+              className="rotate-45 hidden dark:flex"
+            ></Image>
+            <Image
+              src={"/plus_icon_light.svg"}
+              width={20}
+              height={20}
+              alt="plus icon"
+              className="rotate-45 flex dark:hidden"
+            ></Image>
+          </motion.button>
+        )}
+      </div>
+      <div className="flex w-full flex-col items-start justify-start bg-white dark:bg-[#1B1B22] h-fit rounded-2xl p-2 md:p-4 shadow-xl">
+        <p className="text-lg text-slate-900 dark:text-white px-2">
+          {task.description}
+        </p>
+        <Slider value={progress} setValue={setProgress} />
+      </div>
+      <div className="flex flex-col space-y-2">
+        {!task.completed && (
+          <motion.button
+            onClick={() => completeTask(task.id)}
+            className="opacity-100 dark:opacity-50 md:opacity-0 md:group-hover:opacity-100 md:active:opacity-100 active:scale-95 active:opacity-100 rounded-xl w-8 h-8 bg-teal-600 dark:bg-transparent dark:border-2  border-teal-500 transition-all flex items-center justify-center"
+          >
+            <Image
+              src={"/check.svg"}
+              width={24}
+              height={24}
+              alt="plus icon"
+              className="hidden dark:flex"
+            ></Image>
+            <Image
+              src={"/check_light.svg"}
+              width={24}
+              height={24}
+              alt="plus icon"
+              className="flex dark:hidden"
+            ></Image>
+          </motion.button>
+        )}
+        {!task.completed && (
+          <motion.button
+            onClick={() => completeTask(task.id)}
+            className="opacity-100 dark:opacity-50 md:opacity-0 md:group-hover:opacity-100 md:active:opacity-100 active:scale-95 active:opacity-100 rounded-xl w-8 h-8 bg-lime-600 dark:bg-transparent dark:border-2  border-gray-200 transition-all flex items-center justify-center"
+          >
+            <Image
+              src={"/plus_icon_light.svg"}
+              width={20}
+              height={20}
+              alt="plus icon"
+              className="hidden dark:flex"
+            ></Image>
+            <Image
+              src={"/plus_icon_light.svg"}
+              width={20}
+              height={20}
+              alt="plus icon"
+              className="flex dark:hidden"
+            ></Image>
+          </motion.button>
+        )}
+      </div>
     </div>
   );
 }
