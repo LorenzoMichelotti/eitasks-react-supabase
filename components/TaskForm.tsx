@@ -62,6 +62,7 @@ export default function TaskForm({
           className="text-slate-900 dark:text-white py-2 px-4 text-[20px] resize-none w-full h-4/6 bg-white border-2 dark:border-none dark:bg-[#151517] rounded-xl"
         ></textarea>
         <Slider
+          autoHideInput={false}
           value={progress}
           setValue={setProgress}
           callback={() => createTask(description, progress)}

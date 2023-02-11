@@ -90,7 +90,7 @@ export default function TaskCard({
       {!task.completed && (
         <motion.button
           onClick={() => deleteTask(task.id)}
-          className="absolute -left-10 md:-left-1/4 top-1/2 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:active:opacity-100 -translate-y-1/2 active:scale-95 rounded-xl w-8 h-full md:w-16 md:h-16 bg-pink-600 dark:bg-none dark:border-2 border-pink-500  transition-all flex items-center justify-center"
+          className="absolute -left-10 md:-left-1/4 top-1/2 opacity-100 dark:opacity-50 md:opacity-0 md:group-hover:opacity-100 md:active:opacity-100 -translate-y-1/2 active:scale-95 active:opacity-100 rounded-xl w-8 h-full md:w-16 md:h-16 bg-pink-600 dark:bg-transparent dark:border-2 border-pink-500  transition-all flex items-center justify-center"
         >
           <Image
             src={"/plus_icon2.svg"}
@@ -111,7 +111,7 @@ export default function TaskCard({
       {!task.completed && (
         <motion.button
           onClick={() => completeTask(task.id)}
-          className="absolute -right-10 md:-right-1/4 top-1/2 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:active:opacity-100 -translate-y-1/2 active:scale-95 rounded-xl w-8 h-full md:w-16 md:h-16 bg-teal-600 dark:bg-none dark:border-2  border-teal-500 transition-all flex items-center justify-center"
+          className="absolute -right-10 md:-right-1/4 top-1/2 opacity-100 dark:opacity-50 md:opacity-0 md:group-hover:opacity-100 md:active:opacity-100 -translate-y-1/2 active:scale-95 active:opacity-100 rounded-xl w-8 h-full md:w-16 md:h-16 bg-teal-600 dark:bg-transparent dark:border-2  border-teal-500 transition-all flex items-center justify-center"
         >
           <Image
             src={"/check.svg"}
