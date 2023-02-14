@@ -9,7 +9,7 @@ export default function Header({
 }) {
   return (
     <div className="flex flex-col justify-between mb-4">
-      <div className="top-12 ml-auto opacity-50 text-black dark:text-white">
+      <div className="top-12 ml-auto text-black dark:text-gray-500 text-sm">
         {completedTaskCount} / {taskCount + completedTaskCount} completed tasks
       </div>
     </div>

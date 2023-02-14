@@ -1,12 +1,10 @@
-import { scale } from "@/js/Utils";
+import { scale } from "@/services/Utils";
 import {
   motion,
   useDragControls,
-  useForceUpdate,
   useMotionValue,
   useMotionValueEvent,
   useSpring,
-  useTransform,
 } from "framer-motion";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
@@ -15,11 +13,15 @@ export default function Slider({
   setValue,
   autoHideInput = true,
   callback,
+  size = "md",
+  isLocked = false,
 }: {
   value: number;
   setValue: Dispatch<SetStateAction<number>>;
   autoHideInput?: boolean;
   callback?: () => any;
+  size?: string;
+  isLocked?: boolean;
 }) {
   const x = useMotionValue(0);
   const animX = useSpring(x, { damping: 10, bounce: 0.05 });
@@ -29,6 +31,7 @@ export default function Slider({
 
   function startDrag(event: any) {
     event.preventDefault();
+    if (isLocked) return;
     setDragging(true);
     dragControls.start(event, { snapToCursor: true });
     updateDisplay(x.get());
@@ -81,12 +84,16 @@ export default function Slider({
   return (
     <motion.button
       layout
-      className="flex items-center space-x-4 rounded-2xl p-2 md:p-4 w-full"
+      className={`flex items-center space-x-4 rounded-2xl ${
+        size === "md" ? "p-2 md:p-4" : "p-1 md:p-2"
+      } w-full`}
     >
       <motion.div
         layout
         ref={progressBarRef}
-        className="cursor-pointer relative bg-slate-200 dark:bg-black/50 w-full rounded-full h-4 group"
+        className={`cursor-pointer relative bg-slate-200 dark:bg-black/50 w-full rounded-full ${
+          size === "md" ? "h-4" : "h-2"
+        } group`}
       >
         <motion.div
           draggable={false}
@@ -120,7 +127,9 @@ export default function Slider({
             className={`${
               autoHideInput &&
               "opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity"
-            } bg-white cursor-pointer shadow-md border-2 dark:border-none absolute -left-4 w-8 h-8 rounded-full`}
+            } bg-white cursor-pointer shadow-md border-2 dark:border-none absolute -left-4 ${
+              size === "md" ? "w-8 h-8" : "w-4 h-4"
+            } rounded-full`}
           ></motion.div>
         </motion.div>
       </motion.div>
@@ -161,7 +170,11 @@ export default function Slider({
           }
           value={value.toString()}
           type={"text"}
-          className="bg-white border-2 dark:border-none dark:bg-black/50 w-full rounded-lg p-0 sm:p-1 md:p-2 text-center"
+          className={`bg-white border-2 dark:border-none dark:bg-black/50 w-full rounded-lg text-center ${
+            size === "md"
+              ? "text-lg p-0 sm:p-1 md:p-2"
+              : "text-sm p-0 sm:p-0 md:p-1"
+          }`}
         />
         <span className="hidden sm:flex pointer-events-none select-none">
           %
