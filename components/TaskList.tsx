@@ -36,21 +36,23 @@ export default function TaskList() {
         {tasks.map((task) => {
           if (!task.parentTaskId)
             return (
-              // <Reorder.Item
-              //   variants={taskCardVariants}
-              //   custom={task.completed}
-              //   initial={"initial"}
-              //   animate={task.completed ? "completed" : "idle"}
-              //   whileHover={"hovered"}
-              //   exit={"exit"}
-              //   value={task}
-              //   // drag="y"
-              //   layout
-              //   key={task.id}
-              //   className={`w-full h-full relative`} //task
-              // >
-              <TaskCard task={task} key={task.id} />
-              // </Reorder.Item>
+              <Reorder.Item
+                dragListener={false}
+                variants={taskCardVariants}
+                custom={task.completed}
+                initial={"initial"}
+                animate={task.completed ? "completed" : "idle"}
+                // whileHover={"hovered"}
+                exit={"exit"}
+                value={task}
+                // drag="y"
+                layout
+                key={task.id}
+                className={`w-full h-full relative`} //task
+              >
+                <TaskCard task={task} key={task.id} />
+                //{" "}
+              </Reorder.Item>
             );
         })}
       </AnimatePresence>

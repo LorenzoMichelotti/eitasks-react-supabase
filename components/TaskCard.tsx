@@ -112,13 +112,15 @@ export default function TaskCard({
           parentTaskId={task.id}
         />
       </AnimatePresence>
-      <div className="w-11/12 mx-auto mt-2">
-        {tasks
-          ?.filter((t) => t.parentTaskId === task.id)
-          ?.map((task) => (
-            <TaskCard key={task.id} task={task} canHaveSubtasks={false} />
-          ))}
-      </div>
+      {tasks?.filter((t) => t.parentTaskId === task.id)?.length > 0 && (
+        <div className={"w-11/12 mx-auto mt-2"}>
+          {tasks
+            ?.filter((t) => t.parentTaskId === task.id)
+            ?.map((task) => (
+              <TaskCard key={task.id} task={task} canHaveSubtasks={false} />
+            ))}
+        </div>
+      )}
     </div>
   );
 }
