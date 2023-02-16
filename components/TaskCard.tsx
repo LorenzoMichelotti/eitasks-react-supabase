@@ -1,5 +1,6 @@
 import useTaskStore from "@/hooks/UseTaskStore";
 import Task from "@/models/Task";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Slider2 from "./Slider2";
@@ -15,11 +16,20 @@ export default function TaskCard({
 }) {
   const [progress, setProgress] = useState(task.progress);
   const [isLocked, setIsLocked] = useState(false);
+  const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(false);
 
   const { tasks, setTasks } = useTaskStore((state) => ({
     tasks: state.tasks,
     setTasks: state.setTasks,
   }));
+
+  function handleExpandSubtasks() {
+    setIsSubtasksExpanded((prev) => !prev);
+  }
+
+  function getSubtaskCount(tasks: Task[]) {
+    return tasks?.filter((t) => t.parentTaskId === task.id).length;
+  }
 
   function deleteTask(taskId: number) {
     setTasks(
@@ -50,9 +60,16 @@ export default function TaskCard({
   }
 
   useEffect(() => {
+    console.log(progress);
     if (tasks.find((t) => t.id === task.id)?.progress == progress) return;
-    if (task.completed && progress < 100) {
+    const subtasks = tasks.filter((t) => t.parentTaskId === task.id);
+    console.log(subtasks);
+    if (
+      (task.completed || subtasks.some((t) => t.completed === true)) &&
+      progress < 100
+    ) {
       const uncompletedTask = task;
+      console.log(uncompletedTask);
       uncompletedTask.completed = false;
       uncompletedTask.progress = progress;
       tasks.splice(
@@ -81,10 +98,16 @@ export default function TaskCard({
   }, [tasks, task.id]);
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="w-full h-full flex group justify-start items-center">
+    <div className="w-full flex flex-col">
+      <div className="w-full flex group justify-start items-center">
         <div
-          className={`flex m-0 w-full flex-col items-start justify-start bg-white dark:bg-[#1B1B22] h-fit rounded-2xl p-2 md:p-4 shadow-xl`}
+          className={`flex m-0 w-full flex-col items-start shadow-lg border-2 border-black/50 justify-start bg-white dark:bg-[#1B1B22] h-fit 
+          ${canHaveSubtasks ? "p-2 md:p-4" : "p-1 md:p-2"} 
+          ${
+            canHaveSubtasks && getSubtaskCount(tasks) > 0
+              ? "rounded-t-2xl"
+              : "rounded-2xl"
+          }`}
         >
           <div className="flex w-full">
             <p
@@ -94,7 +117,7 @@ export default function TaskCard({
             >
               {task.description}
             </p>
-            <div className="ml-auto mr-2">
+            <div className="ml-auto mr-2 mb-2">
               <TaskCardMenu
                 canHaveSubtasks={canHaveSubtasks}
                 task={task}
@@ -114,13 +137,38 @@ export default function TaskCard({
           </div>
         </div>
       </div>
-      <div className="w-11/12 mx-auto mt-2">
-        {tasks
-          ?.filter((t) => t.parentTaskId === task.id)
-          ?.map((task) => (
-            <TaskCard key={task.id} task={task} canHaveSubtasks={false} />
-          ))}
-      </div>
+      {canHaveSubtasks && getSubtaskCount(tasks) > 0 && (
+        <>
+          <button
+            onClick={handleExpandSubtasks}
+            className={`dark:text-white w-full flex items-center justify-center space-x-2 p-2 bg-slate-400 dark:bg-brand-dark shadow-xl border-l-2 border-r-2 border-b-2 ${
+              !isSubtasksExpanded && "rounded-b-2xl"
+            } dark:border-black/50`}
+          >
+            {isSubtasksExpanded && (
+              <>
+                <ChevronDownIcon></ChevronDownIcon>
+                <span>toggle subtasks</span>
+              </>
+            )}
+            {tasks && !isSubtasksExpanded && canHaveSubtasks && (
+              <>
+                <ChevronDownIcon></ChevronDownIcon>
+                <span>{getSubtaskCount(tasks)} subtasks</span>
+              </>
+            )}
+          </button>
+          {isSubtasksExpanded && (
+            <div className="w-full flex flex-col mx-auto pt-4 pb-2 px-2 rounded-b-2xl max-h-56 overflow-auto space-y-2 bg-slate-400 dark:bg-brand-dark">
+              {tasks
+                ?.filter((t) => t.parentTaskId === task.id)
+                ?.map((task) => (
+                  <TaskCard key={task.id} task={task} canHaveSubtasks={false} />
+                ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

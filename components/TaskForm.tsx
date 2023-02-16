@@ -37,9 +37,15 @@ export default function TaskForm({
       });
       return;
     }
+
+    let uniqueId = tasks.length + 1;
+    while (!isUniqueId(uniqueId)) {
+      uniqueId += 1;
+    }
+
     if (parentTaskId) {
       const a = Promise.resolve(
-        createSubTask(parentTaskId, description, progress)
+        createSubTask(uniqueId, parentTaskId, description, progress)
       );
       toast.promise(a, {
         loading: "Creating sub-task...",
@@ -48,15 +54,15 @@ export default function TaskForm({
       });
       return;
     }
-    createTask();
+    createTask(uniqueId);
   }
 
-  function createTask() {
+  function createTask(uniqueId: number) {
     const newTask: Task = {
       created: new Date().toLocaleDateString(),
       description,
       progress: Math.round(progress),
-      id: tasks.length + 1,
+      id: uniqueId,
     };
     setTasks([newTask, ...tasks]);
 
@@ -64,24 +70,23 @@ export default function TaskForm({
     setProgress(0);
   }
 
+  function isUniqueId(id: number) {
+    return tasks.findIndex((t) => t.id === id) === -1;
+  }
+
   function createSubTask(
+    uniqueId: number,
     parentTaskId: number,
     description: string,
     progress: number
   ) {
     console.log("Creating subtask...");
 
-    const getParentTask: Task | undefined = tasks.find(
-      (task) => task.id == parentTaskId
-    );
-
-    if (!getParentTask) return;
-
     const subtask: Task = {
       created: new Date().toLocaleDateString(),
       description,
       progress: Math.round(progress),
-      id: tasks.length + 1,
+      id: uniqueId,
       parentTaskId,
     };
 

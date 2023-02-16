@@ -28,12 +28,10 @@ export default function Slider({
   const progressBarRef = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
   const [dragging, setDragging] = useState(false);
-  const [hiddenValue, setHiddenValue] = useState(0);
 
   function startDrag(event: any) {
     event.preventDefault();
     if (isLocked) return;
-    // setDragging(true);
     dragControls.start(event, { snapToCursor: true });
     updateDisplay(x.get());
     event.stopPropagation();

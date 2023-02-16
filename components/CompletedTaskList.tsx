@@ -2,7 +2,7 @@ import useTaskStore from "@/hooks/UseTaskStore";
 import Task from "@/models/Task";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
-import { AnimatePresence, Reorder } from "framer-motion";
+import { AnimatePresence, motion, Reorder } from "framer-motion";
 import { useState } from "react";
 import TaskCard from "./TaskCard";
 
@@ -52,8 +52,8 @@ export default function CompletedTaskList() {
             </p>
           </Accordion.Trigger>
         </Accordion.Header>
-        <Accordion.Content className="overflow-hidden">
-          <Reorder.Group
+        <Accordion.Content className="overflow-hidden space-y-4 w-full mt-6 mx-auto h-full">
+          {/* <Reorder.Group
             axis="y"
             values={tasks}
             onReorder={(reorderedTasks: Task[]) => {
@@ -63,32 +63,31 @@ export default function CompletedTaskList() {
               ]);
             }}
             className="space-y-4 w-full mt-6 mx-auto h-full"
-          >
-            <AnimatePresence>
-              {tasks
-                .filter((task) => task.completed)
-                .map((task) => {
-                  if (!task.parentTaskId)
-                    return (
-                      <Reorder.Item
-                        dragListener={false}
-                        variants={taskCardVariants}
-                        custom={task.completed}
-                        initial={"initial"}
-                        animate={task.completed ? "completed" : "idle"}
-                        exit={"exit"}
-                        value={task}
-                        drag="y"
-                        layout
-                        key={task.id}
-                        className={`w-full h-full relative`} //task
-                      >
-                        <TaskCard task={task} key={task.id} />
-                      </Reorder.Item>
-                    );
-                })}
-            </AnimatePresence>
-          </Reorder.Group>
+          > */}
+          <AnimatePresence>
+            {tasks
+              .filter((task) => task.completed)
+              .map((task) => {
+                if (!task.parentTaskId)
+                  return (
+                    <motion.div
+                      dragListener={false}
+                      variants={taskCardVariants}
+                      custom={task.completed}
+                      initial={"initial"}
+                      animate={task.completed ? "completed" : "idle"}
+                      exit={"exit"}
+                      drag="y"
+                      layout
+                      key={task.id}
+                      className={`w-full h-full relative`} //task
+                    >
+                      <TaskCard task={task} key={task.id} />
+                    </motion.div>
+                  );
+              })}
+          </AnimatePresence>
+          {/* </Reorder.Group> */}
         </Accordion.Content>
       </Accordion.Item>
     </Accordion.Root>
