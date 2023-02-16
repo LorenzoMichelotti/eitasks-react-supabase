@@ -38,15 +38,14 @@ export default function TaskList() {
           if (!task.parentTaskId)
             return (
               <Reorder.Item
+                dragListener={false}
                 variants={taskCardVariants}
                 custom={task.completed}
                 initial={"initial"}
                 animate={task.completed ? "completed" : "idle"}
-                whileHover={"hovered"}
                 exit={"exit"}
                 value={task}
-                dragListener={false}
-                // drag="y"
+                drag="y"
                 layout
                 key={task.id}
                 className={`w-full h-full relative`} //task
