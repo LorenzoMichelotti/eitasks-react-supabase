@@ -23,7 +23,7 @@ export default function Tasks() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="w-11/12 md:w-2/3 2xl:w-1/2 mx-auto my-4 md:my-24 h-full">
+      <div className="w-11/12 md:w-2/3 2xl:w-1/2 mx-auto my-4 md:my-24 h-full">
         <NavBar />
         <Header
           completedTaskCount={tasks.filter((t) => t.completed).length}
@@ -48,7 +48,7 @@ export default function Tasks() {
             <span>Lorenzo Michelotti</span>
           </a>
         </footer>
-      </main>
+      </div>
     </>
   );
 }

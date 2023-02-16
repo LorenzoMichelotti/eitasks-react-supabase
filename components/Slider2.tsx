@@ -34,7 +34,9 @@ export default function Slider2({
     <form className="group h-full w-full flex items-center">
       <Slider.Root
         disabled={locked}
-        className="relative items-center select-none touch-none flex h-full w-10/12 mr-4"
+        className={`relative items-center select-none touch-none flex h-full w-10/12 mr-4 ${
+          locked ? "cursor-not-allowed" : "cursor-pointer"
+        }`}
         defaultValue={[0]}
         onValueChange={handleOnValueChange}
         onValueCommit={handleOnValueCommit}
@@ -59,7 +61,9 @@ export default function Slider2({
         </Slider.Track>
         <Slider.Thumb
           className={`bg-white transition-opacity block w-8 h-8 rounded-full outline-none focus:scale-110 ${
-            !thumbAlwaysVisible && "opacity-0 group-hover:opacity-100"
+            locked
+              ? "opacity-0"
+              : !thumbAlwaysVisible && "opacity-0 group-hover:opacity-100"
           }`}
         />
       </Slider.Root>

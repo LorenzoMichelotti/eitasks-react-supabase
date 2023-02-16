@@ -14,7 +14,6 @@ export default function TaskCard({
   canHaveSubtasks?: boolean;
 }) {
   const [progress, setProgress] = useState(task.progress);
-  const [editing, setEditing] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
 
   const { tasks, setTasks } = useTaskStore((state) => ({
@@ -38,9 +37,6 @@ export default function TaskCard({
       return task;
     });
     setTasks(newTasks);
-    setTimeout(() => {
-      setTasks(tasks.filter((task) => task.id !== taskId));
-    }, 1000);
   }
 
   function updateTask(taskId: number, progressChange: number) {
@@ -54,7 +50,19 @@ export default function TaskCard({
   }
 
   useEffect(() => {
-    updateTask(task.id, progress);
+    if (tasks.find((t) => t.id === task.id)?.progress == progress) return;
+    if (task.completed && progress < 100) {
+      const uncompletedTask = task;
+      uncompletedTask.completed = false;
+      uncompletedTask.progress = progress;
+      tasks.splice(
+        tasks.findIndex((t) => t.id == task.id),
+        1,
+        uncompletedTask
+      );
+      setTasks(tasks);
+    } else if (progress >= 100) completeTask(task.id);
+    else updateTask(task.id, progress);
   }, [progress]);
 
   useEffect(() => {
@@ -88,7 +96,9 @@ export default function TaskCard({
             </p>
             <div className="ml-auto mr-2">
               <TaskCardMenu
-                openForm={() => setEditing((old) => !old)}
+                canHaveSubtasks={canHaveSubtasks}
+                task={task}
+                taskId={task.id}
                 completeTask={() => completeTask(task.id)}
                 deleteTask={() => deleteTask(task.id)}
               />
@@ -104,11 +114,6 @@ export default function TaskCard({
           </div>
         </div>
       </div>
-      <TaskForm
-        setIsOpen={setEditing}
-        isOpen={editing}
-        parentTaskId={task.id}
-      />
       <div className="w-11/12 mx-auto mt-2">
         {tasks
           ?.filter((t) => t.parentTaskId === task.id)

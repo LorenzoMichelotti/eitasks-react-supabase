@@ -38,7 +38,14 @@ export default function TaskForm({
       return;
     }
     if (parentTaskId) {
-      createSubTask(parentTaskId, description, progress);
+      const a = Promise.resolve(
+        createSubTask(parentTaskId, description, progress)
+      );
+      toast.promise(a, {
+        loading: "Creating sub-task...",
+        error: "Error while creating sub-task.",
+        success: "New sub-task created.",
+      });
       return;
     }
     createTask();
@@ -98,7 +105,7 @@ export default function TaskForm({
           initial={"closed"}
           animate={isOpen ? "open" : "closed"}
           exit={"closed"}
-          className="w-full focus-within:scale-105 mt-2 transition-transform h-56 flex space-x-2"
+          className="w-full focus-within:scale-105 transition-transform h-56 flex space-x-2"
           id="task_form_container"
         >
           <div
