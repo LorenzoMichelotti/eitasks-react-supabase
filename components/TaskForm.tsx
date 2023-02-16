@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Slider from "./Slider";
+import Slider2 from "./Slider2";
 
 export default function TaskForm({
   parentTaskId,
@@ -26,7 +27,7 @@ export default function TaskForm({
   }));
 
   function create(description: string, progress: number) {
-    if (description == "") {
+    if (description.trim() == "") {
       toast.error("Please enter task description", {
         id: "empty-task-description-toast",
         style: {
@@ -85,8 +86,8 @@ export default function TaskForm({
   }
 
   const formVariant = {
-    closed: { y: -100, opacity: 0 },
-    open: { y: 0, opacity: 1, display: "flex" },
+    closed: { y: -20, opacity: 0, transition: { duration: 0.2 } },
+    open: { y: 0, opacity: 1, transition: { duration: 0.1 } },
   };
 
   return (
@@ -94,13 +95,14 @@ export default function TaskForm({
       {isOpen && (
         <motion.div
           variants={formVariant}
+          initial={"closed"}
           animate={isOpen ? "open" : "closed"}
           exit={"closed"}
           className="w-full focus-within:scale-105 mt-2 transition-transform h-56 flex space-x-2"
           id="task_form_container"
         >
           <div
-            className="w-10/12 h-full bg-white dark:bg-brand-medium shadow-xl p-4 rounded-l-2xl rounded-r-md"
+            className="w-10/12 bg-white dark:bg-brand-medium shadow-xl p-4 rounded-l-2xl rounded-r-md"
             id="task_form"
           >
             <textarea
@@ -118,12 +120,14 @@ export default function TaskForm({
               }
               className="text-slate-900 dark:text-white py-2 px-4 text-[20px] resize-none w-full h-4/6 bg-white border-2 dark:border-none dark:bg-brand-dark rounded-xl"
             ></textarea>
-            <Slider
-              autoHideInput={false}
-              value={progress}
-              setValue={setProgress}
-              callback={() => create(description, progress)}
-            />
+            <div className="mx-2 mt-4">
+              <Slider2
+                thumbAlwaysVisible
+                value={[progress]}
+                setValue={setProgress}
+                callback={() => create(description, progress)}
+              />
+            </div>
           </div>
           <motion.button
             onClick={() => create(description, progress)}

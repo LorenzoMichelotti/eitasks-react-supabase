@@ -1,9 +1,8 @@
 import useTaskStore from "@/hooks/UseTaskStore";
 import Task from "@/models/Task";
 import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
 import { useEffect, useState } from "react";
-import Slider from "./Slider";
+import Slider2 from "./Slider2";
 import TaskCardMenu from "./TaskCardMenu";
 import TaskForm from "./TaskForm";
 
@@ -77,9 +76,7 @@ export default function TaskCard({
     <div className="w-full h-full flex flex-col">
       <div className="w-full h-full flex group justify-start items-center">
         <div
-          className={`flex m-0 ${
-            editing ? "w-10/12" : "w-full"
-          } flex-col items-start justify-start bg-white dark:bg-[#1B1B22] h-fit rounded-2xl p-2 md:p-4 shadow-xl`}
+          className={`flex m-0 w-full flex-col items-start justify-start bg-white dark:bg-[#1B1B22] h-fit rounded-2xl p-2 md:p-4 shadow-xl`}
         >
           <div className="flex w-full">
             <p
@@ -97,21 +94,21 @@ export default function TaskCard({
               />
             </div>
           </div>
-          <Slider
-            size={canHaveSubtasks ? "md" : "sm"}
-            value={progress}
-            setValue={setProgress}
-            isLocked={isLocked}
-          />
+          <div className="w-full px-2 py-1">
+            <Slider2
+              locked={isLocked}
+              setValue={setProgress}
+              value={[progress]}
+              thumbAlwaysVisible={false}
+            />
+          </div>
         </div>
       </div>
-      <AnimatePresence>
-        <TaskForm
-          setIsOpen={setEditing}
-          isOpen={editing}
-          parentTaskId={task.id}
-        />
-      </AnimatePresence>
+      <TaskForm
+        setIsOpen={setEditing}
+        isOpen={editing}
+        parentTaskId={task.id}
+      />
       <div className="w-11/12 mx-auto mt-2">
         {tasks
           ?.filter((t) => t.parentTaskId === task.id)

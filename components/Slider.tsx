@@ -28,11 +28,12 @@ export default function Slider({
   const progressBarRef = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
   const [dragging, setDragging] = useState(false);
+  const [hiddenValue, setHiddenValue] = useState(0);
 
   function startDrag(event: any) {
     event.preventDefault();
     if (isLocked) return;
-    setDragging(true);
+    // setDragging(true);
     dragControls.start(event, { snapToCursor: true });
     updateDisplay(x.get());
     event.stopPropagation();
@@ -54,7 +55,7 @@ export default function Slider({
   }
 
   useMotionValueEvent(x, "change", (latest: any) => {
-    if (!dragging) return;
+    // if (!dragging) return;
     updateDisplay(latest);
   });
 
@@ -65,13 +66,14 @@ export default function Slider({
     window.addEventListener("touchend", (event: any) => {
       setDragging(false);
     });
-    return () =>
+    return () => {
       window.removeEventListener("mouseup", (event: any) => {
         setDragging(false);
       });
-    window.removeEventListener("touchend", (event: any) => {
-      setDragging(false);
-    });
+      window.removeEventListener("touchend", (event: any) => {
+        setDragging(false);
+      });
+    };
   }, []);
 
   useEffect(() => {
