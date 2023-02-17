@@ -53,41 +53,14 @@ export default function CompletedTaskList() {
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content className="overflow-hidden space-y-4 w-full mt-6 mx-auto h-full">
-          {/* <Reorder.Group
-            axis="y"
-            values={tasks}
-            onReorder={(reorderedTasks: Task[]) => {
-              setTasks([
-                ...reorderedTasks,
-                ...tasks.filter((t) => t.parentTaskId),
-              ]);
-            }}
-            className="space-y-4 w-full mt-6 mx-auto h-full"
-          > */}
           <AnimatePresence>
             {tasks
               .filter((task) => task.completed)
               .map((task) => {
                 if (!task.parentTaskId)
-                  return (
-                    <motion.div
-                      dragListener={false}
-                      variants={taskCardVariants}
-                      custom={task.completed}
-                      initial={"initial"}
-                      animate={task.completed ? "completed" : "idle"}
-                      exit={"exit"}
-                      drag="y"
-                      layout
-                      key={task.id}
-                      className={`w-full h-full relative`} //task
-                    >
-                      <TaskCard task={task} key={task.id} />
-                    </motion.div>
-                  );
+                  return <TaskCard task={task} key={task.id} />;
               })}
           </AnimatePresence>
-          {/* </Reorder.Group> */}
         </Accordion.Content>
       </Accordion.Item>
     </Accordion.Root>

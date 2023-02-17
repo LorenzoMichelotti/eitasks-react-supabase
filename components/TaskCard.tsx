@@ -5,7 +5,24 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Slider2 from "./Slider2";
 import TaskCardMenu from "./TaskCardMenu";
-import TaskForm from "./TaskForm";
+
+const taskCardVariants = {
+  initial: { opacity: 0, y: -20, scaleY: 1 },
+  idle: { opacity: 1, y: 0, scaleY: 1 },
+  completed: {
+    opacity: 1,
+    rotateX: 360,
+    scaleY: 1,
+    scaleX: 1,
+    y: 0,
+    transition: { duration: 0.5 },
+  },
+  exit: (param: boolean) => ({
+    opacity: 0,
+    scale: 1,
+    y: param ? -10 : 10,
+  }),
+};
 
 export default function TaskCard({
   task,
@@ -60,22 +77,16 @@ export default function TaskCard({
   }
 
   useEffect(() => {
-    console.log(progress);
     if (tasks.find((t) => t.id === task.id)?.progress == progress) return;
-    const subtasks = tasks.filter((t) => t.parentTaskId === task.id);
-    console.log(subtasks);
-    if (
-      (task.completed || subtasks.some((t) => t.completed === true)) &&
-      progress < 100
-    ) {
-      const uncompletedTask = task;
-      console.log(uncompletedTask);
-      uncompletedTask.completed = false;
-      uncompletedTask.progress = progress;
+    // const subtasks = tasks.filter((t) => t.parentTaskId === task.id);
+
+    if (task.completed && progress < 100) {
+      task.completed = false;
+      task.progress = progress;
       tasks.splice(
         tasks.findIndex((t) => t.id == task.id),
         1,
-        uncompletedTask
+        task
       );
       setTasks(tasks);
     } else if (progress >= 100) completeTask(task.id);
@@ -98,7 +109,16 @@ export default function TaskCard({
   }, [tasks, task.id]);
 
   return (
-    <div className="w-full flex flex-col">
+    <motion.div
+      variants={taskCardVariants}
+      custom={task.completed}
+      initial={"initial"}
+      animate={task.completed ? "completed" : "idle"}
+      exit={"exit"}
+      layout="position"
+      key={task.id}
+      className={`w-full h-full relative flex-col`} //task
+    >
       <div className="w-full flex group justify-start items-center">
         <div
           className={`flex m-0 w-full flex-col items-start shadow-lg border-2 border-black/50 justify-start bg-white dark:bg-[#1B1B22] h-fit 
@@ -115,7 +135,7 @@ export default function TaskCard({
                 canHaveSubtasks ? "text-lg" : "text-sm"
               } text-slate-900 dark:text-white px-2`}
             >
-              {task.description}
+              {task.completed && "(completed) "} {task.description}
             </p>
             <div className="ml-auto mr-2 mb-2">
               <TaskCardMenu
@@ -158,17 +178,36 @@ export default function TaskCard({
               </>
             )}
           </button>
-          {isSubtasksExpanded && (
-            <div className="w-full flex flex-col mx-auto pt-4 pb-2 px-2 rounded-b-2xl max-h-56 overflow-auto space-y-2 bg-slate-400 dark:bg-brand-dark">
-              {tasks
-                ?.filter((t) => t.parentTaskId === task.id)
-                ?.map((task) => (
-                  <TaskCard key={task.id} task={task} canHaveSubtasks={false} />
-                ))}
-            </div>
-          )}
+          <AnimatePresence>
+            {isSubtasksExpanded && (
+              <motion.div
+                variants={subtasksContainerExpandedVariants}
+                initial={"closed"}
+                animate={isSubtasksExpanded ? "open" : "closed"}
+                exit={"closed"}
+                className="w-full flex flex-col origin-top mx-auto pt-4 pb-2 px-2 rounded-b-2xl bg-slate-400 dark:bg-brand-dark"
+              >
+                <div className="w-full flex flex-col space-y-2 max-h-56 overflow-auto">
+                  {tasks
+                    ?.filter((t) => t.parentTaskId === task.id)
+                    ?.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        canHaveSubtasks={false}
+                      />
+                    ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </>
       )}
-    </div>
+    </motion.div>
   );
 }
+
+const subtasksContainerExpandedVariants = {
+  closed: { scaleY: 0, opacity: 0 },
+  open: { scaleY: 1, opacity: 1 },
+};
