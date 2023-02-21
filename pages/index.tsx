@@ -31,7 +31,7 @@ export default function Tasks() {
         />
         <TaskForm></TaskForm>
         <TaskList></TaskList>
-        <footer className="text-black dark:text-white w-full justify-center my-24 flex items-center space-x-4 opacity-50 hover:opacity-100">
+        <footer className="text-black dark:text-white w-full justify-center my-56 flex items-center space-x-4 opacity-50 hover:opacity-100">
           <a
             className="text-black dark:text-white hover:text-blue-500 hover:underline flex space-x-1 items-center"
             href="https://www.linkedin.com/in/lorenzo-michelotti-b1b4441a7/"

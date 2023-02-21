@@ -5,8 +5,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import Slider from "./Slider";
 import Slider2 from "./Slider2";
+import { v4 as uuidv4 } from "uuid";
 
 export default function TaskForm({
   parentTaskId,
@@ -38,10 +38,7 @@ export default function TaskForm({
       return;
     }
 
-    let uniqueId = tasks.length + 1;
-    while (!isUniqueId(uniqueId)) {
-      uniqueId += 1;
-    }
+    let uniqueId = uuidv4();
 
     if (parentTaskId) {
       const a = Promise.resolve(

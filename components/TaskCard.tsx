@@ -56,14 +56,27 @@ export default function TaskCard({
 
   function completeTask(taskId: number) {
     setProgress(100);
-    const newTasks = tasks.map((task) => {
-      if (task.id === taskId) {
-        task.progress = 100;
-        task.completed = true;
-      }
-      return task;
-    });
-    setTasks(newTasks);
+    if (tasks.some((task) => task.id === taskId && task.completed)) {
+      // uncomplete task
+      const newTasks = tasks.map((task) => {
+        if (task.id === taskId || task.parentTaskId === taskId) {
+          task.progress = 0;
+          task.completed = false;
+        }
+        return task;
+      });
+      setTasks(newTasks);
+    } else {
+      // complete task
+      const newTasks = tasks.map((task) => {
+        if (task.id === taskId || task.parentTaskId === taskId) {
+          task.progress = 100;
+          task.completed = true;
+        }
+        return task;
+      });
+      setTasks(newTasks);
+    }
   }
 
   function updateTask(taskId: number, progressChange: number) {
@@ -79,16 +92,19 @@ export default function TaskCard({
   useEffect(() => {
     if (tasks.find((t) => t.id === task.id)?.progress == progress) return;
     // const subtasks = tasks.filter((t) => t.parentTaskId === task.id);
+    console.log(progress);
+    console.log(task.completed);
 
     if (task.completed && progress < 100) {
       task.completed = false;
       task.progress = progress;
-      tasks.splice(
-        tasks.findIndex((t) => t.id == task.id),
+      const updatedList = [...tasks];
+      updatedList.splice(
+        updatedList.findIndex((t) => t.id == task.id),
         1,
         task
       );
-      setTasks(tasks);
+      setTasks(updatedList);
     } else if (progress >= 100) completeTask(task.id);
     else updateTask(task.id, progress);
   }, [progress]);
@@ -105,6 +121,7 @@ export default function TaskCard({
     setIsLocked(true);
     const totalPercentage =
       subtasksProgressSum.reduce((a, b) => a + b) / subtasksProgressSum.length;
+
     setProgress(Math.round(totalPercentage));
   }, [tasks, task.id]);
 
@@ -135,7 +152,7 @@ export default function TaskCard({
                 canHaveSubtasks ? "text-lg" : "text-sm"
               } text-slate-900 dark:text-white px-2`}
             >
-              {task.completed && "(completed) "} {task.description}
+              {task.description}
             </p>
             <div className="ml-auto mr-2 mb-2">
               <TaskCardMenu
