@@ -13,7 +13,7 @@ export default function TaskForm({
   isOpen = true,
   setIsOpen,
 }: {
-  parentTaskId?: number;
+  parentTaskId?: string;
   isOpen?: boolean;
   setIsOpen?: Dispatch<SetStateAction<boolean>>;
 }) {
@@ -54,7 +54,7 @@ export default function TaskForm({
     createTask(uniqueId);
   }
 
-  function createTask(uniqueId: number) {
+  function createTask(uniqueId: string) {
     const newTask: Task = {
       created: new Date().toLocaleDateString(),
       description,
@@ -67,13 +67,9 @@ export default function TaskForm({
     setProgress(0);
   }
 
-  function isUniqueId(id: number) {
-    return tasks.findIndex((t) => t.id === id) === -1;
-  }
-
   function createSubTask(
-    uniqueId: number,
-    parentTaskId: number,
+    uniqueId: string,
+    parentTaskId: string,
     description: string,
     progress: number
   ) {

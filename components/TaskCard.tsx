@@ -48,13 +48,13 @@ export default function TaskCard({
     return tasks?.filter((t) => t.parentTaskId === task.id).length;
   }
 
-  function deleteTask(taskId: number) {
+  function deleteTask(taskId: string) {
     setTasks(
       tasks.filter((task) => task.id !== taskId && task.parentTaskId !== taskId)
     );
   }
 
-  function completeTask(taskId: number) {
+  function completeTask(taskId: string) {
     setProgress(100);
     if (tasks.some((task) => task.id === taskId && task.completed)) {
       // uncomplete task
@@ -79,7 +79,7 @@ export default function TaskCard({
     }
   }
 
-  function updateTask(taskId: number, progressChange: number) {
+  function updateTask(taskId: string, progressChange: number) {
     const newTasks = tasks.map((task) => {
       if (task.id === taskId) {
         task.progress = progressChange;

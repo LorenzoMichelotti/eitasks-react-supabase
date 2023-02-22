@@ -19,7 +19,7 @@ export default function TaskCardMenu({
   canHaveSubtasks,
 }: {
   task: Task;
-  taskId: number;
+  taskId: string;
   completeTask: () => void;
   deleteTask: () => void;
   canHaveSubtasks: boolean;
