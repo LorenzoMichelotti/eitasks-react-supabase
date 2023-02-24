@@ -9,7 +9,7 @@ export default function CreateTaskModal({
   open,
   onOpenChange,
 }: {
-  taskId: string;
+  taskId: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {

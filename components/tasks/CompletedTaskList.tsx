@@ -54,12 +54,13 @@ export default function CompletedTaskList() {
         </Accordion.Header>
         <Accordion.Content className="overflow-hidden space-y-4 w-full mt-6 mx-auto h-full">
           <AnimatePresence>
-            {tasks
-              .filter((task) => task.completed)
-              .map((task) => {
-                if (!task.parentTaskId)
-                  return <TaskCard task={task} key={task.id} />;
-              })}
+            {tasks.length > 0 &&
+              tasks
+                .filter((task) => task.completed)
+                .map((task) => {
+                  if (!task.parentTaskId)
+                    return <TaskCard task={task} key={task.id} />;
+                })}
           </AnimatePresence>
         </Accordion.Content>
       </Accordion.Item>

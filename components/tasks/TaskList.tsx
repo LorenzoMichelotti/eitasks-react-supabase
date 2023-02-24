@@ -12,12 +12,13 @@ export default function TaskList() {
   return (
     <div className="w-full flex flex-col mt-12 space-y-4 mx-auto h-full">
       <AnimatePresence>
-        {tasks
-          .filter((task) => !task.completed)
-          .map((task) => {
-            if (!task.parentTaskId)
-              return <TaskCard task={task} key={task.id} />;
-          })}
+        {tasks.length > 0 &&
+          tasks
+            .filter((task) => !task.completed)
+            .map((task) => {
+              if (!task.parentTaskId)
+                return <TaskCard task={task} key={task.id} />;
+            })}
       </AnimatePresence>
       <CompletedTaskList></CompletedTaskList>
     </div>

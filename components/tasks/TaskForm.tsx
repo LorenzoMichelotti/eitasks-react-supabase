@@ -1,11 +1,10 @@
 import useTaskStore from "@/hooks/UseTaskStore";
-import Task from "@/models/Task";
-import Tasks from "@/pages";
+import Task, { CreateTask } from "@/models/Task";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import Slider2 from "./Slider2";
+import Slider2 from "../Slider2";
 import { v4 as uuidv4 } from "uuid";
 
 export default function TaskForm({
@@ -13,7 +12,7 @@ export default function TaskForm({
   isOpen = true,
   setIsOpen,
 }: {
-  parentTaskId?: string;
+  parentTaskId?: number;
   isOpen?: boolean;
   setIsOpen?: Dispatch<SetStateAction<boolean>>;
 }) {
@@ -21,9 +20,11 @@ export default function TaskForm({
   const [progress, setProgress] = useState(0);
   const textArea = useRef<HTMLTextAreaElement>(null);
 
-  const { tasks, setTasks } = useTaskStore((state) => ({
+  const { tasks, setTasks, addTask, profile } = useTaskStore((state) => ({
     tasks: state.tasks,
     setTasks: state.setTasks,
+    addTask: state.addTask,
+    profile: state.profile,
   }));
 
   function create(description: string, progress: number) {
@@ -42,7 +43,7 @@ export default function TaskForm({
 
     if (parentTaskId) {
       const a = Promise.resolve(
-        createSubTask(uniqueId, parentTaskId, description, progress)
+        createSubTask(parentTaskId, description, progress)
       );
       toast.promise(a, {
         loading: "Creating sub-task...",
@@ -55,37 +56,39 @@ export default function TaskForm({
   }
 
   function createTask(uniqueId: string) {
-    const newTask: Task = {
-      created: new Date().toLocaleDateString(),
+    if (!profile) {
+      toast.error("Profile error");
+      return;
+    }
+    const newTask: CreateTask = {
       description,
       progress: Math.round(progress),
-      id: uniqueId,
+      profileId: profile.id,
     };
-    setTasks([newTask, ...tasks]);
-
+    addTask(newTask);
     setDescription("");
     setProgress(0);
   }
 
   function createSubTask(
-    uniqueId: string,
-    parentTaskId: string,
+    parentTaskId: number,
     description: string,
     progress: number
   ) {
     console.log("Creating subtask...");
-
-    const subtask: Task = {
-      created: new Date().toLocaleDateString(),
+    if (!profile) {
+      console.log("Profile error");
+      toast.error("Profile error");
+      return;
+    }
+    const subtask: CreateTask = {
       description,
       progress: Math.round(progress),
-      id: uniqueId,
-      parentTaskId,
+      parentTaskId: parentTaskId,
+      profileId: profile.id,
     };
-
-    setTasks([subtask, ...tasks]);
+    addTask(subtask);
     setIsOpen && setIsOpen(false);
-
     setDescription("");
     setProgress(0);
   }

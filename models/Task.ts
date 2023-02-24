@@ -1,8 +1,15 @@
 export default interface Task {
-  id: string;
+  id: number;
+  created_at?: string;
+  completed?: boolean;
+  parentTaskId?: number;
   description: string;
   progress: number;
-  created: string;
-  completed?: boolean;
-  parentTaskId?: string;
+}
+
+export interface CreateTask {
+  description: string;
+  progress: number;
+  parentTaskId?: number;
+  profileId: number;
 }
