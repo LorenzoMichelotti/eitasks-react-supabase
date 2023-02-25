@@ -11,7 +11,7 @@ export default function TaskList() {
     setTasks: state.setTasks,
   }));
   return (
-    <div className="w-full flex flex-col space-y-2 px-4 mx-auto lg:mr-4 h-full">
+    <div className="w-full sm:max-w-lg lg:max-w-full flex flex-col space-y-2 mx-auto lg:mr-4 h-full">
       <div className="hidden lg:flex pb-[0.35rem]">
         <TaskForm></TaskForm>
       </div>
