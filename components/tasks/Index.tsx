@@ -66,7 +66,7 @@ export default function Tasks({ session }: { session: Session }) {
             </div>
           </div>
           <TaskList></TaskList>
-          <div className="text-white flex lg:hidden xl:flex bg-brand-medium rounded-xl p-4">
+          <div className="text-white hidden lg:hidden xl:flex bg-brand-medium rounded-xl p-4">
             Task Details placeholder
           </div>
         </div>
