@@ -12,12 +12,15 @@ module.exports = {
     extend: {
       colors: {
         brand: {
+          lightest: "#8188A4",
           light_hover: "#485577",
           light_active: "#3D4062",
           light: "#3C435C",
           medium: "#1B1B22",
-          dark: "#151517",
+          dark: "#131318",
+          darkest: "#0D0D11",
         },
+        placeholder: "#5A5A6D",
       },
       keyframes: {
         appear: {

@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import Slider2 from "../Slider2";
+import Slider3 from "../Slider3";
 import TaskCardMenu from "./TaskCardMenu";
 
 const taskCardVariants = {
@@ -132,13 +133,13 @@ export default function TaskCard({
         initial={"initial"}
         animate={task.completed ? "completed" : "idle"}
         exit={"exit"}
-        layout="position"
+        layout
         key={task.id}
         className={`w-full h-full relative flex-col`} //task
       >
         <div className="w-full flex group justify-start items-center">
           <div
-            className={`flex m-0 w-full flex-col items-start shadow-lg border-2 border-black/50 justify-start bg-white dark:bg-[#1B1B22] h-fit 
+            className={`flex m-0 w-full flex-col items-start shadow-lg border-2 border-black/50 justify-start bg-white dark:bg-[#1B1B22] h-[102px]
           ${canHaveSubtasks ? "p-2 md:p-4" : "p-1 md:p-2"} 
           ${
             canHaveSubtasks && getSubtaskCount(tasks) > 0
@@ -149,12 +150,12 @@ export default function TaskCard({
             <div className="flex w-full">
               <p
                 className={`${
-                  canHaveSubtasks ? "text-lg" : "text-sm"
+                  canHaveSubtasks ? "text-md" : "text-sm"
                 } text-slate-900 dark:text-white px-2`}
               >
                 {task.description}
               </p>
-              <div className="ml-auto mr-2 mb-2">
+              {/* <div className="ml-auto mr-2 mb-2">
                 <TaskCardMenu
                   canHaveSubtasks={canHaveSubtasks}
                   task={task}
@@ -162,13 +163,13 @@ export default function TaskCard({
                   completeTask={() => completeTask(task.id)}
                   deleteTask={() => deleteTask(task.id)}
                 />
-              </div>
+              </div> */}
             </div>
-            <div className="w-full px-2 py-1">
-              <Slider2
-                locked={isLocked}
+            <div className="w-full px-2 py-1 mt-auto">
+              <Slider3
+                locked={true}
                 setValue={setProgress}
-                value={[progress]}
+                value={progress}
                 thumbAlwaysVisible={false}
               />
             </div>

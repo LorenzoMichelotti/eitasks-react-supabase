@@ -4,6 +4,7 @@ import { GitHubLogoIcon, LinkedInLogoIcon } from "@radix-ui/react-icons";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { Session } from "@supabase/supabase-js";
 import { useEffect } from "react";
+import BottomNavigation from "../BottomNavigation";
 import Header from "../Header";
 import NavBar from "../Navbar";
 import TaskForm from "./TaskForm";
@@ -51,27 +52,47 @@ export default function Tasks({ session }: { session: Session }) {
 
   if (user && tasks)
     return (
-      <div className="w-11/12 md:w-2/3 lg:3/4 2xl:w-1/2 max-w-[700px] mx-auto my-4 md:my-24 h-full">
+      <div className="w-full">
         <NavBar supabase={supabase} />
-        <Header />
-        <TaskForm></TaskForm>
-        <TaskList></TaskList>
-        <footer className="text-black dark:text-white w-full justify-center my-56 flex items-center space-x-4 opacity-50 hover:opacity-100">
-          <a
-            className="text-black dark:text-white hover:text-blue-500 hover:underline flex space-x-1 items-center"
-            href="https://www.linkedin.com/in/lorenzo-michelotti-b1b4441a7/"
-          >
-            <LinkedInLogoIcon></LinkedInLogoIcon>
-            <span>Lorenzo Michelotti</span>
-          </a>
-          <span>|</span>
-          <a
-            className="text-black dark:text-white hover:text-blue-500 hover:underline flex space-x-1 items-center"
-            href="https://github.com/LorenzoMichelotti/lolo-tasks"
-          >
-            <GitHubLogoIcon></GitHubLogoIcon>
-            <span>Lorenzo Michelotti</span>
-          </a>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+          {/* <Header /> */}
+          {/* CONTENT CARDS */}
+          <TaskList></TaskList>
+        </div>
+        <div className="flex lg:hidden">
+          <div className="pb-60 lg:pb-0"></div>
+          <div className="fixed z-10 flex flex-col space-y-4 bottom-0 p-4 pb-12 pt-6 w-full bg-brand-darkest">
+            <TaskForm></TaskForm>
+            <BottomNavigation></BottomNavigation>
+          </div>
+        </div>
+        <footer className="text-black hidden lg:flex flex-col text-[12px] dark:text-white w-full justify-center mb-12 mt-24 items-center opacity-50 hover:opacity-100">
+          <div className="flex justify-center">
+            <a
+              className="text-black dark:text-white hover:text-blue-500 hover:underline flex space-x-1 items-center"
+              href="https://www.linkedin.com/in/lorenzo-michelotti-b1b4441a7/"
+            >
+              <LinkedInLogoIcon></LinkedInLogoIcon>
+              <span className="whitespace-nowrap flex sm:hidden">
+                LoMichelotti
+              </span>
+              <span className="whitespace-nowrap hidden sm:flex">
+                Lorenzo Michelotti
+              </span>
+            </a>
+            <a
+              className="text-black dark:text-white ml-4 hover:text-blue-500 hover:underline flex space-x-1 items-center"
+              href="https://github.com/LorenzoMichelotti/lolo-tasks"
+            >
+              <GitHubLogoIcon></GitHubLogoIcon>
+              <span className="whitespace-nowrap flex sm:hidden">
+                LoMichelotti
+              </span>
+              <span className="whitespace-nowrap hidden sm:flex">
+                Lorenzo Michelotti
+              </span>
+            </a>
+          </div>
         </footer>
       </div>
     );

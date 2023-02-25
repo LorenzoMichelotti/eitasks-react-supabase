@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import Slider2 from "../Slider2";
 import { v4 as uuidv4 } from "uuid";
 
 export default function TaskForm({
@@ -17,8 +16,7 @@ export default function TaskForm({
   setIsOpen?: Dispatch<SetStateAction<boolean>>;
 }) {
   const [description, setDescription] = useState("");
-  const [progress, setProgress] = useState(0);
-  const textArea = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const { tasks, setTasks, addTask, profile } = useTaskStore((state) => ({
     tasks: state.tasks,
@@ -27,7 +25,7 @@ export default function TaskForm({
     profile: state.profile,
   }));
 
-  function create(description: string, progress: number) {
+  function create(description: string) {
     if (description.trim() == "") {
       toast.error("Please enter task description", {
         id: "empty-task-description-toast",
@@ -42,9 +40,7 @@ export default function TaskForm({
     let uniqueId = uuidv4();
 
     if (parentTaskId) {
-      const a = Promise.resolve(
-        createSubTask(parentTaskId, description, progress)
-      );
+      const a = Promise.resolve(createSubTask(parentTaskId, description));
       toast.promise(a, {
         loading: "Creating sub-task...",
         error: "Error while creating sub-task.",
@@ -62,19 +58,14 @@ export default function TaskForm({
     }
     const newTask: CreateTask = {
       description,
-      progress: Math.round(progress),
+      progress: 0,
       profileId: profile.id,
     };
     addTask(newTask);
     setDescription("");
-    setProgress(0);
   }
 
-  function createSubTask(
-    parentTaskId: number,
-    description: string,
-    progress: number
-  ) {
+  function createSubTask(parentTaskId: number, description: string) {
     console.log("Creating subtask...");
     if (!profile) {
       console.log("Profile error");
@@ -83,14 +74,13 @@ export default function TaskForm({
     }
     const subtask: CreateTask = {
       description,
-      progress: Math.round(progress),
+      progress: 0,
       parentTaskId: parentTaskId,
       profileId: profile.id,
     };
     addTask(subtask);
     setIsOpen && setIsOpen(false);
     setDescription("");
-    setProgress(0);
   }
 
   const formVariant = {
@@ -106,39 +96,25 @@ export default function TaskForm({
           initial={"closed"}
           animate={isOpen ? "open" : "closed"}
           exit={"closed"}
-          className="w-full focus-within:scale-105 transition-transform h-56 flex space-x-2"
+          className="w-full mx-auto transition-transform h-24 flex space-x-2"
           id="task_form_container"
         >
-          <div
-            className="w-10/12 bg-white dark:bg-brand-medium shadow-xl p-4 rounded-l-2xl rounded-r-md"
-            id="task_form"
-          >
-            <textarea
-              ref={textArea}
-              value={description}
-              onChange={(e) => {
-                e.preventDefault();
-                setDescription(e.target.value);
-                e.stopPropagation();
-              }}
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                !e.shiftKey &&
-                create(description, progress)
-              }
-              className="text-slate-900 dark:text-white py-2 px-4 text-[20px] resize-none w-full h-4/6 bg-white border-2 dark:border-none dark:bg-brand-dark rounded-xl"
-            ></textarea>
-            <div className="mx-2 mt-4">
-              <Slider2
-                thumbAlwaysVisible
-                value={[progress]}
-                setValue={setProgress}
-                callback={() => create(description, progress)}
-              />
-            </div>
-          </div>
+          <input
+            ref={inputRef}
+            value={description}
+            placeholder="New task title"
+            onChange={(e) => {
+              e.preventDefault();
+              setDescription(e.target.value);
+              e.stopPropagation();
+            }}
+            onKeyDown={(e) =>
+              e.key === "Enter" && !e.shiftKey && create(description)
+            }
+            className="text-slate-900 placeholder:text-placeholder placeholder:font-semibold text-center flex items-center dark:text-white py-2 px-4 text-md resize-none w-10/12 h-full bg-white border-2 dark:border-none dark:bg-brand-dark rounded-l-xl rounded-r-md"
+          ></input>
           <motion.button
-            onClick={() => create(description, progress)}
+            onClick={() => create(description)}
             whileHover={{
               backgroundColor: "#485577",
               transition: { duration: 0.2, type: "spring" },
@@ -151,11 +127,10 @@ export default function TaskForm({
             className="bg-sky-600 dark:bg-brand-light w-2/12 rounded-r-2xl rounded-l-md shadow-xl flex justify-center items-center"
           >
             <Image
-              src={"/plus_icon_light.svg"}
-              width={24}
-              height={24}
+              src={"/assets/add.svg"}
+              width={42}
+              height={42}
               alt="plus icon"
-              className="dark:opacity-50"
             ></Image>
           </motion.button>
         </motion.div>
