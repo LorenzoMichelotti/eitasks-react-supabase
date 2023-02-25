@@ -7,6 +7,8 @@ import { create } from "zustand";
 
 interface TaskState {
   tasks: Task[];
+  activeTask?: Task;
+  setActiveTask: (task?: Task) => void;
   load: (
     profile: Profile,
     supabase: SupabaseClient<any, "public", any>
@@ -21,6 +23,9 @@ interface TaskState {
 
 const useTaskStore = create<TaskState>((set) => ({
   tasks: [],
+  setActiveTask: (task?: Task) => {
+    set((state) => ({ ...state, activeTask: task || undefined }));
+  },
   updateTask: async (task: Task) => updateTask(task),
   removeTask: async (taskId: number, profileId: number) => {
     removeTask(taskId, profileId);
@@ -40,7 +45,11 @@ const useTaskStore = create<TaskState>((set) => ({
   ) => {
     const tasks = await load(profile, supabase);
     set((state: TaskState) => {
-      return { ...state, tasks };
+      const currentActiveTask = state.activeTask;
+      let updatedActiveTask;
+      if (currentActiveTask)
+        updatedActiveTask = tasks?.find((t) => t.id === currentActiveTask.id);
+      return { ...state, tasks, activeTask: updatedActiveTask };
     });
   },
   setTasks: (tasks: Task[]) => {
@@ -79,7 +88,6 @@ async function load(
   }
 
   console.log("tasks loaded successfully");
-  console.log(tasks);
 
   return tasks as Task[];
 }
@@ -110,7 +118,7 @@ async function createTask(task: CreateTask) {
 
   let newTask: CreateTask = {
     progress: task.progress,
-    description: task.description,
+    title: task.title,
     profileId: task.profileId,
   };
 
@@ -123,16 +131,21 @@ async function createTask(task: CreateTask) {
 }
 
 async function updateTask(task: Task) {
-  console.log(task);
   if (!task) return toast.error("Error updating task!");
   const { error } = await supabase
     .from("tasks")
     .update({
       progress: task.progress,
       completed: task.completed,
+      title: task.title,
+      description: task.description,
     })
     .eq("id", task.id);
   if (error) return toast.error("Error updating task!");
+  else
+    return toast.success("The task was updated.", {
+      id: "updating-task-toast",
+    });
 }
 
 export default useTaskStore;

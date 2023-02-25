@@ -21,6 +21,10 @@ module.exports = {
           darkest: "#0D0D11",
         },
         placeholder: "#5A5A6D",
+        success: {
+          400: "#0FDF88",
+          500: "#2D9469",
+        },
       },
       keyframes: {
         appear: {

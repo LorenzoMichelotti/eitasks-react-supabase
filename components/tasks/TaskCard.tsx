@@ -4,48 +4,38 @@ import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import Slider2 from "../Slider2";
 import Slider3 from "../Slider3";
-import TaskCardMenu from "./TaskCardMenu";
-
-const taskCardVariants = {
-  initial: { opacity: 0, y: -20, scaleY: 1 },
-  idle: { opacity: 1, y: 0, scaleY: 1 },
-  completed: {
-    opacity: 1,
-    rotateX: 360,
-    scaleY: 1,
-    scaleX: 1,
-    y: 0,
-    transition: { duration: 0.5 },
-  },
-  exit: (param: boolean) => ({
-    opacity: 0,
-    scale: 1,
-    y: param ? -10 : 10,
-  }),
-};
 
 export default function TaskCard({
   task,
   canHaveSubtasks = true,
+  taskCardVariants,
 }: {
   task: Task;
   canHaveSubtasks?: boolean;
+  taskCardVariants: {};
 }) {
   const [progress, setProgress] = useState(task.progress);
   const [isLocked, setIsLocked] = useState(false);
   const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(false);
 
-  const { tasks, setTasks, removeTask, profile, updateTask } = useTaskStore(
-    (state) => ({
-      tasks: state.tasks,
-      setTasks: state.setTasks,
-      removeTask: state.removeTask,
-      profile: state.profile,
-      updateTask: state.updateTask,
-    })
-  );
+  const {
+    tasks,
+    setTasks,
+    removeTask,
+    profile,
+    updateTask,
+    activeTask,
+    setActiveTask,
+  } = useTaskStore((state) => ({
+    activeTask: state.activeTask,
+    tasks: state.tasks,
+    setTasks: state.setTasks,
+    removeTask: state.removeTask,
+    profile: state.profile,
+    updateTask: state.updateTask,
+    setActiveTask: state.setActiveTask,
+  }));
 
   function handleExpandSubtasks() {
     setIsSubtasksExpanded((prev) => !prev);
@@ -82,11 +72,13 @@ export default function TaskCard({
     }
   }
 
+  function handleSetAsActiveTask() {
+    if (activeTask?.id !== task.id) setActiveTask(task);
+  }
+
   useEffect(() => {
     if (!task || !task.id) return;
     if (tasks.find((t) => t.id === task.id)?.progress == progress) return;
-    console.log(progress);
-    console.log(task.completed);
 
     if (task.completed && progress < 100) {
       task.completed = false;
@@ -129,13 +121,12 @@ export default function TaskCard({
     return (
       <motion.div
         variants={taskCardVariants}
-        custom={task.completed}
-        initial={"initial"}
-        animate={task.completed ? "completed" : "idle"}
-        exit={"exit"}
-        layout
+        // custom={task.completed}
+        // animate={task.completed ? "completed" : "idle"}
+        // layout
         key={task.id}
-        className={`w-full h-full relative flex-col`} //task
+        onClick={handleSetAsActiveTask}
+        className={`w-full h-full cursor-pointer relative flex-col`} //task
       >
         <div className="w-full flex group justify-start items-center">
           <div
@@ -153,7 +144,7 @@ export default function TaskCard({
                   canHaveSubtasks ? "text-md" : "text-sm"
                 } text-slate-900 dark:text-white px-2`}
               >
-                {task.description}
+                {task.title}
               </p>
               {/* <div className="ml-auto mr-2 mb-2">
                 <TaskCardMenu
@@ -175,7 +166,7 @@ export default function TaskCard({
             </div>
           </div>
         </div>
-        {canHaveSubtasks && getSubtaskCount(tasks) > 0 && (
+        {/* {canHaveSubtasks && getSubtaskCount(tasks) > 0 && (
           <>
             <button
               onClick={handleExpandSubtasks}
@@ -208,10 +199,11 @@ export default function TaskCard({
                   <div className="w-full flex flex-col space-y-2 max-h-56 overflow-auto">
                     {tasks
                       ?.filter((t) => t.parentTaskId === task.id)
-                      ?.map((task) => (
+                      ?.map((subtask) => (
                         <TaskCard
-                          key={task.id}
-                          task={task}
+                          taskCardVariants={taskCardVariants}
+                          key={subtask.id}
+                          task={subtask}
                           canHaveSubtasks={false}
                         />
                       ))}
@@ -220,7 +212,7 @@ export default function TaskCard({
               )}
             </AnimatePresence>
           </>
-        )}
+        )} */}
       </motion.div>
     );
   else return null;

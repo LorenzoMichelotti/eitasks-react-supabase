@@ -5,13 +5,47 @@ import TaskCard from "./TaskCard";
 import CompletedTaskList from "./CompletedTaskList";
 import TaskForm from "./TaskForm";
 
+const taskCardVariants = {
+  initial: {
+    opacity: 0,
+    y: -20,
+    scaleY: 1,
+    transition: { staggerChildren: 0.5, type: "spring" },
+  },
+  idle: {
+    opacity: 1,
+    y: 0,
+    scaleY: 1,
+    transition: { staggerChildren: 0.5, type: "spring" },
+  },
+  completed: {
+    opacity: 1,
+    rotateX: 360,
+    scaleY: 1,
+    scaleX: 1,
+    y: 0,
+    transition: { duration: 0.3 },
+  },
+  exit: (param: boolean) => ({
+    opacity: 0,
+    scale: 1,
+    y: param ? -10 : 10,
+  }),
+};
+
 export default function TaskList() {
   const { tasks, setTasks } = useTaskStore((state) => ({
     tasks: state.tasks,
     setTasks: state.setTasks,
   }));
   return (
-    <div className="w-full sm:max-w-lg lg:max-w-full flex flex-col space-y-2 mx-auto lg:mr-4 h-full">
+    <motion.div
+      initial={"initial"}
+      animate={"idle"}
+      exit={"exit"}
+      variants={taskCardVariants}
+      className="w-full sm:max-w-lg lg:max-w-full flex flex-col space-y-2 mx-auto lg:mr-4 h-full"
+    >
       <div className="hidden lg:flex pb-[0.35rem]">
         <TaskForm></TaskForm>
       </div>
@@ -21,10 +55,16 @@ export default function TaskList() {
             .filter((task) => !task.completed)
             .map((task) => {
               if (!task.parentTaskId)
-                return <TaskCard task={task} key={task.id} />;
+                return (
+                  <TaskCard
+                    taskCardVariants={taskCardVariants}
+                    task={task}
+                    key={task.id}
+                  />
+                );
             })}
       </AnimatePresence>
       {/* <CompletedTaskList></CompletedTaskList> */}
-    </div>
+    </motion.div>
   );
 }

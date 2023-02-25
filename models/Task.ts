@@ -5,11 +5,12 @@ export default interface Task {
   parentTaskId?: number;
   description: string;
   progress: number;
+  title: string;
 }
 
 export interface CreateTask {
-  description: string;
   progress: number;
   parentTaskId?: number;
   profileId: number;
+  title: string;
 }

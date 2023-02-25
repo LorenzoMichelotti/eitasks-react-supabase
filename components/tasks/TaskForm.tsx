@@ -15,7 +15,7 @@ export default function TaskForm({
   isOpen?: boolean;
   setIsOpen?: Dispatch<SetStateAction<boolean>>;
 }) {
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { tasks, setTasks, addTask, profile } = useTaskStore((state) => ({
@@ -57,12 +57,12 @@ export default function TaskForm({
       return;
     }
     const newTask: CreateTask = {
-      description,
+      title,
       progress: 0,
       profileId: profile.id,
     };
     addTask(newTask);
-    setDescription("");
+    setTitle("");
   }
 
   function createSubTask(parentTaskId: number, description: string) {
@@ -73,14 +73,14 @@ export default function TaskForm({
       return;
     }
     const subtask: CreateTask = {
-      description,
+      title,
       progress: 0,
       parentTaskId: parentTaskId,
       profileId: profile.id,
     };
     addTask(subtask);
     setIsOpen && setIsOpen(false);
-    setDescription("");
+    setTitle("");
   }
 
   const formVariant = {
@@ -101,20 +101,18 @@ export default function TaskForm({
         >
           <input
             ref={inputRef}
-            value={description}
+            value={title}
             placeholder="New task title"
             onChange={(e) => {
               e.preventDefault();
-              setDescription(e.target.value);
+              setTitle(e.target.value);
               e.stopPropagation();
             }}
-            onKeyDown={(e) =>
-              e.key === "Enter" && !e.shiftKey && create(description)
-            }
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && create(title)}
             className="text-slate-900 placeholder:text-placeholder placeholder:font-semibold text-center flex items-center dark:text-white py-2 px-4 text-md resize-none w-10/12 h-full bg-white border-2 dark:border-none dark:bg-brand-dark rounded-l-xl rounded-r-md"
           ></input>
           <motion.button
-            onClick={() => create(description)}
+            onClick={() => create(title)}
             whileHover={{
               backgroundColor: "#485577",
               transition: { duration: 0.2, type: "spring" },
