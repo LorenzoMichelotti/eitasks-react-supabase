@@ -54,10 +54,21 @@ export default function Tasks({ session }: { session: Session }) {
     return (
       <div className="w-full">
         <NavBar supabase={supabase} />
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 mx-4 lg:grid-cols-2 xl:grid-cols-3">
           {/* <Header /> */}
           {/* CONTENT CARDS */}
+          <div className="hidden lg:grid grid-rows-2 xl:grid-rows-1 gap-4">
+            <div className="text-white bg-brand-medium rounded-xl p-4">
+              Projects placeholder
+            </div>
+            <div className="text-white hidden lg:flex xl:hidden bg-brand-medium rounded-xl p-4">
+              Task Details placeholder
+            </div>
+          </div>
           <TaskList></TaskList>
+          <div className="text-white flex lg:hidden xl:flex bg-brand-medium rounded-xl p-4">
+            Task Details placeholder
+          </div>
         </div>
         <div className="flex lg:hidden">
           <div className="pb-60 lg:pb-0"></div>
