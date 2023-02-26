@@ -1,6 +1,6 @@
 import useTaskStore from "@/hooks/UseTaskStore";
 import Task from "@/models/Task";
-import { Cross1Icon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
+import { MinusIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { motion } from "framer-motion";
 import moment from "moment";
@@ -11,7 +11,6 @@ export default function TaskDetails() {
   const [isEditing, setIsEditing] = useState(false);
   const [formTitle, setFormTitle] = useState("");
   const [formDescription, setFormDescription] = useState("");
-  const supabase = useSupabaseClient();
   const { activeTask, setActiveTask, updateTask, profile, removeTask } =
     useTaskStore((state) => ({
       activeTask: state.activeTask,
@@ -93,7 +92,7 @@ export default function TaskDetails() {
           onClick={() => setActiveTask()}
           className="p-2 hover:bg-brand-darkest rounded-full transition-colors"
         >
-          <Cross1Icon></Cross1Icon>
+          <MinusIcon></MinusIcon>
         </button>
       </div>
       {activeTask && (
@@ -120,6 +119,7 @@ export default function TaskDetails() {
           {activeTask.description && !isEditing ? (
             <p>{activeTask.description}</p>
           ) : (
+            // TASK DESCRIPTION EDITOR
             <form onSubmit={handleSubmit} action="POST" className="w-full">
               <textarea
                 value={formDescription}

@@ -11,14 +11,14 @@ export default function BottomNavigation() {
               width={42}
               height={42}
               alt="plus icon"
-              className="block lg:hidden"
+              className="block lg:hidden aspect-auto"
             ></Image>
             <Image
               src={"/assets/bar_chart.svg"}
               width={24}
               height={24}
               alt="plus icon"
-              className="hidden lg:block"
+              className="hidden aspect-auto lg:block"
             ></Image>
           </button>
         </li>
@@ -29,14 +29,14 @@ export default function BottomNavigation() {
               width={42}
               height={42}
               alt="plus icon"
-              className="block lg:hidden"
+              className="block lg:hidden aspect-auto"
             ></Image>
             <Image
               src={"/assets/library_books.svg"}
               width={24}
               height={24}
               alt="plus icon"
-              className="hidden lg:block"
+              className="hidden aspect-auto lg:block"
             ></Image>
           </button>
         </li>
@@ -47,14 +47,14 @@ export default function BottomNavigation() {
               width={42}
               height={42}
               alt="plus icon"
-              className="block lg:hidden"
+              className="block lg:hidden aspect-auto"
             ></Image>
             <Image
               src={"/assets/home.svg"}
               width={24}
               height={24}
               alt="plus icon"
-              className="hidden lg:block"
+              className="hidden aspect-auto lg:block"
             ></Image>
           </button>
         </li>
@@ -65,14 +65,14 @@ export default function BottomNavigation() {
               width={42}
               height={42}
               alt="plus icon"
-              className="block lg:hidden"
+              className="block lg:hidden aspect-auto"
             ></Image>
             <Image
               src={"/assets/person.svg"}
               width={24}
               height={24}
               alt="plus icon"
-              className="hidden lg:block"
+              className="hidden aspect-auto lg:block"
             ></Image>
           </button>
         </li>

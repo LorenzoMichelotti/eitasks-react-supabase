@@ -6,7 +6,6 @@ import { Session } from "@supabase/supabase-js";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import BottomNavigation from "../BottomNavigation";
-import Header from "../Header";
 import NavBar from "../Navbar";
 import TaskDetails from "./TaskDetails";
 import TaskForm from "./TaskForm";

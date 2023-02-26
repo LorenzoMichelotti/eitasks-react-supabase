@@ -16,38 +16,20 @@ export default function TaskCard({
   taskCardVariants: {};
 }) {
   const [progress, setProgress] = useState(task.progress);
-  const [isLocked, setIsLocked] = useState(false);
-  const [isSubtasksExpanded, setIsSubtasksExpanded] = useState(false);
 
-  const {
-    tasks,
-    setTasks,
-    removeTask,
-    profile,
-    updateTask,
-    activeTask,
-    setActiveTask,
-  } = useTaskStore((state) => ({
-    activeTask: state.activeTask,
-    tasks: state.tasks,
-    setTasks: state.setTasks,
-    removeTask: state.removeTask,
-    profile: state.profile,
-    updateTask: state.updateTask,
-    setActiveTask: state.setActiveTask,
-  }));
-
-  function handleExpandSubtasks() {
-    setIsSubtasksExpanded((prev) => !prev);
-  }
+  const { tasks, setTasks, updateTask, activeTask, setActiveTask } =
+    useTaskStore((state) => ({
+      activeTask: state.activeTask,
+      tasks: state.tasks,
+      setTasks: state.setTasks,
+      removeTask: state.removeTask,
+      profile: state.profile,
+      updateTask: state.updateTask,
+      setActiveTask: state.setActiveTask,
+    }));
 
   function getSubtaskCount(tasks: Task[]) {
     return tasks?.filter((t) => t.parentTaskId === task.id).length;
-  }
-
-  function deleteTask(taskId: number) {
-    if (profile) removeTask(taskId, profile?.id);
-    else toast.error("Invalid profile");
   }
 
   function completeTask(taskId: number) {
@@ -107,10 +89,8 @@ export default function TaskCard({
         .filter((t) => t.parentTaskId === task.id)
         .map((task) => task.progress) ?? [];
     if (subtasksProgressSum.length <= 0) {
-      setIsLocked(false);
       return;
     }
-    setIsLocked(true);
     const totalPercentage =
       subtasksProgressSum.reduce((a, b) => a + b) / subtasksProgressSum.length;
 
@@ -121,13 +101,22 @@ export default function TaskCard({
     return (
       <motion.div
         variants={taskCardVariants}
-        // custom={task.completed}
-        // animate={task.completed ? "completed" : "idle"}
-        // layout
         key={task.id}
         onClick={handleSetAsActiveTask}
         className={`w-full h-full cursor-pointer relative flex-col`} //task
       >
+        <AnimatePresence>
+          {activeTask?.id === task.id && (
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0, opacity: 0 }}
+              key={"task-selection-box"}
+              layout
+              className="absolute border-4 border-brand-light w-[103%] h-[115%] rounded-2xl -left-2 -top-2"
+            ></motion.div>
+          )}
+        </AnimatePresence>
         <div className="w-full flex group justify-start items-center">
           <div
             className={`flex m-0 w-full flex-col items-start shadow-lg border-2 border-black/50 justify-start bg-white dark:bg-[#1B1B22] h-[102px]
@@ -146,15 +135,6 @@ export default function TaskCard({
               >
                 {task.title}
               </p>
-              {/* <div className="ml-auto mr-2 mb-2">
-                <TaskCardMenu
-                  canHaveSubtasks={canHaveSubtasks}
-                  task={task}
-                  taskId={task.id}
-                  completeTask={() => completeTask(task.id)}
-                  deleteTask={() => deleteTask(task.id)}
-                />
-              </div> */}
             </div>
             <div className="w-full px-2 py-1 mt-auto">
               <Slider3
@@ -166,53 +146,6 @@ export default function TaskCard({
             </div>
           </div>
         </div>
-        {/* {canHaveSubtasks && getSubtaskCount(tasks) > 0 && (
-          <>
-            <button
-              onClick={handleExpandSubtasks}
-              className={`dark:text-white w-full flex items-center justify-center space-x-2 p-2 bg-slate-400 dark:bg-brand-dark shadow-xl border-l-2 border-r-2 border-b-2 ${
-                !isSubtasksExpanded && "rounded-b-2xl"
-              } dark:border-black/50`}
-            >
-              {isSubtasksExpanded && (
-                <>
-                  <ChevronDownIcon></ChevronDownIcon>
-                  <span>toggle subtasks</span>
-                </>
-              )}
-              {tasks && !isSubtasksExpanded && canHaveSubtasks && (
-                <>
-                  <ChevronDownIcon></ChevronDownIcon>
-                  <span>{getSubtaskCount(tasks)} subtasks</span>
-                </>
-              )}
-            </button>
-            <AnimatePresence>
-              {isSubtasksExpanded && (
-                <motion.div
-                  variants={subtasksContainerExpandedVariants}
-                  initial={"closed"}
-                  animate={isSubtasksExpanded ? "open" : "closed"}
-                  exit={"closed"}
-                  className="w-full flex flex-col origin-top mx-auto pt-4 pb-2 px-2 rounded-b-2xl bg-slate-400 dark:bg-brand-dark"
-                >
-                  <div className="w-full flex flex-col space-y-2 max-h-56 overflow-auto">
-                    {tasks
-                      ?.filter((t) => t.parentTaskId === task.id)
-                      ?.map((subtask) => (
-                        <TaskCard
-                          taskCardVariants={taskCardVariants}
-                          key={subtask.id}
-                          task={subtask}
-                          canHaveSubtasks={false}
-                        />
-                      ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </>
-        )} */}
       </motion.div>
     );
   else return null;

@@ -59,7 +59,13 @@ export default function CompletedTaskList() {
                 .filter((task) => task.completed)
                 .map((task) => {
                   if (!task.parentTaskId)
-                    return <TaskCard task={task} key={task.id} />;
+                    return (
+                      <TaskCard
+                        taskCardVariants={taskCardVariants}
+                        task={task}
+                        key={task.id}
+                      />
+                    );
                 })}
           </AnimatePresence>
         </Accordion.Content>

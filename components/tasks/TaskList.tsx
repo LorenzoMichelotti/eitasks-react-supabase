@@ -2,7 +2,6 @@ import useTaskStore from "@/hooks/UseTaskStore";
 import Task from "@/models/Task";
 import { AnimatePresence, motion, Reorder } from "framer-motion";
 import TaskCard from "./TaskCard";
-import CompletedTaskList from "./CompletedTaskList";
 import TaskForm from "./TaskForm";
 
 const taskCardVariants = {
@@ -10,13 +9,13 @@ const taskCardVariants = {
     opacity: 0,
     y: -20,
     scaleY: 1,
-    transition: { staggerChildren: 0.5, type: "spring" },
+    transition: { staggerChildren: 0.1, type: "spring" },
   },
   idle: {
     opacity: 1,
     y: 0,
     scaleY: 1,
-    transition: { staggerChildren: 0.5, type: "spring" },
+    transition: { staggerChildren: 0.1, type: "spring" },
   },
   completed: {
     opacity: 1,
@@ -44,7 +43,7 @@ export default function TaskList() {
       animate={"idle"}
       exit={"exit"}
       variants={taskCardVariants}
-      className="w-full sm:max-w-lg lg:max-w-full flex flex-col space-y-2 mx-auto lg:mr-4 h-full"
+      className="relative w-full sm:max-w-lg lg:max-w-full flex flex-col space-y-2 mx-auto lg:mr-4 h-full"
     >
       <div className="hidden lg:flex pb-[0.35rem]">
         <TaskForm></TaskForm>
