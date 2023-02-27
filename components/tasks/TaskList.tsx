@@ -1,5 +1,4 @@
 import useTaskStore from "@/hooks/UseTaskStore";
-import Task from "@/models/Task";
 import { AnimatePresence, motion, Reorder } from "framer-motion";
 import TaskCard from "./TaskCard";
 import TaskForm from "./TaskForm";

@@ -3,7 +3,7 @@ import Task from "@/models/Task";
 import { TrashIcon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
 import moment from "moment";
-import TaskCard from "../TaskCard";
+import { useEffect, useState } from "react";
 import TaskForm from "../TaskForm";
 
 export default function TaskReader({
@@ -11,16 +11,36 @@ export default function TaskReader({
 }: {
   deleteTask: (taskId?: number, closeDetails?: boolean) => void;
 }) {
-  const { activeTask, tasks, updateTask } = useTaskStore((state) => ({
-    activeTask: state.activeTask,
-    tasks: state.tasks,
-    updateTask: state.updateTask,
-  }));
+  const [subtasks, setSubtasks] = useState<Task[]>([]);
+  const { activeTask, updateTask, getSubtasks, profile } = useTaskStore(
+    (state) => ({
+      activeTask: state.activeTask,
+      tasks: state.tasks,
+      updateTask: state.updateTask,
+      getSubtasks: state.getSubtasks,
+      profile: state.profile,
+    })
+  );
 
   function toggleSubtask(subtask: Task) {
+    if (!activeTask) return;
     subtask.completed = !subtask.completed;
+    const updatedProgress =
+      (subtasks.filter((t) => t.completed).length * 100) / subtasks.length;
+    activeTask.progress = Math.round(updatedProgress);
+    updateTask(activeTask);
     updateTask(subtask);
   }
+
+  async function loadSubtasks() {
+    if (!activeTask || !profile) return;
+    const resp = await getSubtasks(activeTask.id, profile.id);
+    setSubtasks(resp.subtasks);
+  }
+
+  useEffect(() => {
+    loadSubtasks();
+  }, [activeTask]);
 
   if (activeTask)
     return (
@@ -39,29 +59,27 @@ export default function TaskReader({
           {/* subtasks */}
           <TaskForm parentTaskId={activeTask.id} subtaskMode={true} />
           <div className="flex max-h-64 overflow-auto flex-col space-y-1 mt-4">
-            {tasks
-              .filter((task) => task.parentTaskId === activeTask.id)
-              .map((subtask) => (
-                <div
-                  key={subtask.id}
-                  className="flex p-2 px-4 items-center justify-between hover:bg-brand-medium rounded-lg"
-                >
-                  <div className="flex space-x-4">
-                    <input
-                      type="checkbox"
-                      onClick={() => toggleSubtask(subtask)}
-                      checked={subtask.completed}
-                    />
-                    <span>{subtask.title}</span>
-                  </div>
-                  <button
-                    onClick={() => deleteTask(subtask.id)}
-                    className="hover:text-pink-500 w-8 h-8 flex justify-center items-center rounded-full"
-                  >
-                    <TrashIcon></TrashIcon>
-                  </button>
+            {subtasks.map((subtask) => (
+              <div
+                key={subtask.id}
+                className="flex p-2 px-4 items-center justify-between hover:bg-brand-medium rounded-lg"
+              >
+                <div className="flex space-x-4">
+                  <input
+                    type="checkbox"
+                    onChange={() => toggleSubtask(subtask)}
+                    checked={subtask.completed}
+                  />
+                  <span>{subtask.title}</span>
                 </div>
-              ))}
+                <button
+                  onClick={() => deleteTask(subtask.id)}
+                  className="hover:text-pink-500 w-8 h-8 flex justify-center items-center rounded-full"
+                >
+                  <TrashIcon></TrashIcon>
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </motion.div>

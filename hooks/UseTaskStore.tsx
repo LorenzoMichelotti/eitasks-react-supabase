@@ -22,6 +22,10 @@ interface TaskState {
   profile?: Profile;
   loadProfile: (profile: Profile) => void;
   updateTask: (task: Task) => void;
+  getSubtasks: (
+    taskId: number,
+    profileId: number
+  ) => Promise<{ subtasks: Task[]; count: number }>;
 }
 
 const useTaskStore = create<TaskState>((set) => ({
@@ -74,6 +78,8 @@ const useTaskStore = create<TaskState>((set) => ({
   },
   loadProfile: (profile: Profile) =>
     set((state: TaskState) => ({ ...state, profile })),
+  getSubtasks: (taskId: number, profileId: number) =>
+    getSubtasks(taskId, profileId),
 }));
 
 async function load(
@@ -173,6 +179,29 @@ async function updateTask(task: Task) {
     return toast.success("The task was updated.", {
       id: "updating-task-toast",
     });
+}
+
+async function getSubtasks(
+  taskId: number,
+  profileId: number
+): Promise<{ subtasks: Task[]; count: number }> {
+  let {
+    data: subtasks,
+    count,
+    error,
+  } = await supabase
+    .from("tasks")
+    .select("*", { count: "exact" })
+    .eq("profileId", profileId)
+    .eq("parentTaskId", taskId)
+    .order("created_at", { ascending: false });
+
+  if (error || !subtasks) {
+    console.log(error);
+    return { subtasks: [], count: 0 };
+  }
+
+  return { subtasks: subtasks as Task[], count: count ?? 0 };
 }
 
 export default useTaskStore;

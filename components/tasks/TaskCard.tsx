@@ -12,8 +12,6 @@ export default function TaskCard({
   canHaveSubtasks?: boolean;
   taskCardVariants: {};
 }) {
-  const [progress, setProgress] = useState(task.progress);
-
   const { tasks, activeTask, setActiveTask } = useTaskStore((state) => ({
     activeTask: state.activeTask,
     tasks: state.tasks,
@@ -25,14 +23,6 @@ export default function TaskCard({
   function handleSetAsActiveTask() {
     if (activeTask?.id !== task.id) setActiveTask(task);
   }
-
-  useEffect(() => {
-    const subtasks = tasks.filter((t) => t.parentTaskId === task.id) ?? [];
-    if (subtasks.length <= 0) return;
-    const totalPercentage =
-      (subtasks.filter((t) => t.completed).length * 100) / subtasks.length;
-    setProgress(Math.round(totalPercentage));
-  }, [tasks, task.id]);
 
   if (task && task.id != undefined)
     return (
@@ -66,8 +56,8 @@ export default function TaskCard({
             <div className="w-full px-2 py-1 mt-auto">
               <Slider3
                 locked={true}
-                setValue={setProgress}
-                value={progress}
+                setValue={() => {}}
+                value={task.progress}
                 thumbAlwaysVisible={false}
               />
             </div>
