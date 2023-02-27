@@ -4,39 +4,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Slider3 from "../Slider3";
 
-const taskCardVariants = {
-  initial: {
-    opacity: 0,
-    y: -20,
-    scaleY: 1,
-    transition: { staggerChildren: 0.1, type: "spring" },
-  },
-  idle: {
-    opacity: 1,
-    y: 0,
-    scaleY: 1,
-    transition: { staggerChildren: 0.1, type: "spring" },
-  },
-  completed: {
-    opacity: 1,
-    rotateX: 360,
-    scaleY: 1,
-    scaleX: 1,
-    y: 0,
-    transition: { duration: 0.3 },
-  },
-  exit: (param: boolean) => ({
-    opacity: 0,
-    scale: 1,
-    y: param ? -10 : 10,
-  }),
-};
-
 export default function TaskCard({
   task,
+  taskCardVariants,
 }: {
   task: Task;
   canHaveSubtasks?: boolean;
+  taskCardVariants: {};
 }) {
   const [progress, setProgress] = useState(task.progress);
 
