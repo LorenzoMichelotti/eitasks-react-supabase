@@ -7,20 +7,22 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import BottomNavigation from "../BottomNavigation";
 import NavBar from "../Navbar";
-import TaskDetails from "./TaskDetails";
+import ProjectsList from "./ProjectsPanel/ProjectsList";
+import TaskDetails from "./TaskDetailsPanel/TaskDetails";
 import TaskForm from "./TaskForm";
 import TaskList from "./TaskList";
+import { Pagination } from "@nextui-org/react";
 
 export default function Tasks({ session }: { session: Session }) {
-  const { tasks, loadTasks, profile, loadProfile, activeTask } = useTaskStore(
-    (state) => ({
+  const { tasks, loadTasks, profile, loadProfile, activeTask, taskCount } =
+    useTaskStore((state) => ({
       tasks: state.tasks,
+      taskCount: state.taskCount,
       loadTasks: state.load,
       loadProfile: state.loadProfile,
       profile: state.profile,
       activeTask: state.activeTask,
-    })
-  );
+    }));
 
   const supabase = useSupabaseClient();
   const user = useUser();
@@ -54,6 +56,10 @@ export default function Tasks({ session }: { session: Session }) {
     };
   }, []);
 
+  function getPage(page: number) {
+    if (profile) loadTasks(profile, supabase, page, 5);
+  }
+
   const cardVariants = {
     enter: { scale: 0.5, opacity: 0 },
     idle: { scale: 1, opacity: 1 },
@@ -64,10 +70,8 @@ export default function Tasks({ session }: { session: Session }) {
     return (
       <div className="w-full">
         <NavBar supabase={supabase} />
-        <div className="grid grid-cols-1 gap-4 mx-4 lg:grid-cols-2 xl:grid-cols-3">
-          {/* <Header /> */}
+        <div className="grid grid-cols-1 pb-4 gap-4 mx-4 lg:grid-cols-2 xl:grid-cols-3">
           {/* CONTENT CARDS */}
-          {/* <div className="hidden lg:grid lg:grid-rows-2 xl:grid-rows-1 gap-4"> */}
           <AnimatePresence>
             <div className="hidden lg:flex lg:flex-col gap-4">
               <motion.div
@@ -75,11 +79,10 @@ export default function Tasks({ session }: { session: Session }) {
                 initial="enter"
                 animate="idle"
                 exit="exit"
-                key={"projects"}
                 layout
-                className="text-white h-full bg-brand-dark rounded-xl p-4"
+                className="text-white h-full"
               >
-                Projects placeholder
+                <ProjectsList />
               </motion.div>
               {activeTask && (
                 <motion.div
@@ -113,6 +116,17 @@ export default function Tasks({ session }: { session: Session }) {
             )}
           </AnimatePresence>
         </div>
+        <div className="grid grid-cols-1 pb-4 gap-4 mx-4 lg:grid-cols-2 xl:grid-cols-3">
+          <div></div>
+          <div className="w-full flex justify-center">
+            <Pagination
+              onChange={getPage}
+              total={Math.ceil(taskCount / 5)}
+              initialPage={1}
+            />
+          </div>
+        </div>
+
         <div className="flex lg:hidden">
           <div className="pb-60 lg:pb-0"></div>
           <div className="fixed z-10 flex flex-col space-y-4 bottom-0 p-4 pb-12 pt-6 w-full bg-brand-darkest">
@@ -120,6 +134,7 @@ export default function Tasks({ session }: { session: Session }) {
             <BottomNavigation></BottomNavigation>
           </div>
         </div>
+
         <footer className="text-black hidden lg:flex flex-col text-[12px] dark:text-white w-full justify-center mb-12 mt-24 items-center opacity-50 hover:opacity-100">
           <div className="flex justify-center">
             <a

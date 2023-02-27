@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import { NextUIProvider } from "@nextui-org/react";
 import {
   createBrowserSupabaseClient,
   Session,
@@ -7,6 +8,11 @@ import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import type { AppProps } from "next/app";
 import { useState } from "react";
 import { Toaster } from "react-hot-toast";
+import { createTheme } from "@nextui-org/react";
+
+const darkTheme = createTheme({
+  type: "dark",
+});
 
 export default function App({
   Component,
@@ -35,7 +41,9 @@ export default function App({
         supabaseClient={supabase}
         initialSession={pageProps.initialSession}
       >
-        <Component {...pageProps} />
+        <NextUIProvider theme={darkTheme}>
+          <Component {...pageProps} />
+        </NextUIProvider>
       </SessionContextProvider>
     </>
   );

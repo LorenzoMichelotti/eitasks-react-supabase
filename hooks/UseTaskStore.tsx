@@ -7,11 +7,14 @@ import { create } from "zustand";
 
 interface TaskState {
   tasks: Task[];
+  taskCount: number;
   activeTask?: Task;
   setActiveTask: (task?: Task) => void;
   load: (
     profile: Profile,
-    supabase: SupabaseClient<any, "public", any>
+    supabase: SupabaseClient<any, "public", any>,
+    page?: number,
+    maxPerPage?: number
   ) => void;
   setTasks: (tasks: Task[]) => void;
   addTask: (task: CreateTask) => void;
@@ -23,6 +26,7 @@ interface TaskState {
 
 const useTaskStore = create<TaskState>((set) => ({
   tasks: [],
+  taskCount: 0,
   setActiveTask: (task?: Task) => {
     set((state) => ({ ...state, activeTask: task || undefined }));
   },
@@ -41,16 +45,26 @@ const useTaskStore = create<TaskState>((set) => ({
   addTask: async (task: CreateTask) => createTask(task),
   load: async (
     profile: Profile,
-    supabase: SupabaseClient<any, "public", any>
+    supabase: SupabaseClient<any, "public", any>,
+    page: number = 1,
+    maxPerPage: number = 5
   ) => {
-    const tasks = await load(profile, supabase);
-    set((state: TaskState) => {
-      const currentActiveTask = state.activeTask;
-      let updatedActiveTask;
-      if (currentActiveTask)
-        updatedActiveTask = tasks?.find((t) => t.id === currentActiveTask.id);
-      return { ...state, tasks, activeTask: updatedActiveTask };
-    });
+    const data = await load(profile, supabase, page, maxPerPage);
+    if (data)
+      set((state: TaskState) => {
+        // const currentActiveTask = state.activeTask;
+        // let updatedActiveTask;
+        // if (currentActiveTask)
+        //   updatedActiveTask = data.tasks?.find(
+        //     (t) => t.id === currentActiveTask.id
+        //   );
+        return {
+          ...state,
+          tasks: data.tasks,
+          taskCount: data.count ?? 0,
+          // activeTask: updatedActiveTask,
+        };
+      });
   },
   setTasks: (tasks: Task[]) => {
     set((state: TaskState) => ({
@@ -64,32 +78,45 @@ const useTaskStore = create<TaskState>((set) => ({
 
 async function load(
   profile: Profile,
-  supabase: SupabaseClient<any, "public", any>
+  supabase: SupabaseClient<any, "public", any>,
+  page: number = 1,
+  maxPerPage: number = 5
 ) {
-  let { data: tasks, error } = await supabase
+  let maxRange = maxPerPage;
+  if (page === 1) {
+    maxRange -= 1;
+  }
+
+  let {
+    data: tasks,
+    count,
+    error,
+  } = await supabase
     .from("tasks")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("profileId", profile?.id)
-    .order("created_at", { ascending: false });
+    .is("parentTaskId", null)
+    .order("created_at", { ascending: false })
+    .range((page - 1) * maxRange, maxRange);
 
   if (error) {
     console.log(error);
-    return;
+    return { tasks: [], count: 0 };
   }
 
   if (!tasks) {
     console.log("no save data found.");
-    return [];
+    return { tasks: [], count: 0 };
   }
 
   if (tasks.length < 0) {
     console.log("found save data with no tasks to load.");
-    return [];
+    return { tasks: [], count: 0 };
   }
 
   console.log("tasks loaded successfully");
 
-  return tasks as Task[];
+  return { tasks: tasks as Task[], count: count };
 }
 
 async function removeTask(taskId: number, profileId: number) {

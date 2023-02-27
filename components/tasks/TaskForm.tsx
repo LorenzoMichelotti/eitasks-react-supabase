@@ -1,5 +1,5 @@
 import useTaskStore from "@/hooks/UseTaskStore";
-import Task, { CreateTask } from "@/models/Task";
+import { CreateTask } from "@/models/Task";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
@@ -10,17 +10,17 @@ export default function TaskForm({
   parentTaskId,
   isOpen = true,
   setIsOpen,
+  subtaskMode = false,
 }: {
   parentTaskId?: number;
   isOpen?: boolean;
   setIsOpen?: Dispatch<SetStateAction<boolean>>;
+  subtaskMode?: boolean;
 }) {
   const [title, setTitle] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { tasks, setTasks, addTask, profile } = useTaskStore((state) => ({
-    tasks: state.tasks,
-    setTasks: state.setTasks,
+  const { addTask, profile } = useTaskStore((state) => ({
     addTask: state.addTask,
     profile: state.profile,
   }));
@@ -40,12 +40,7 @@ export default function TaskForm({
     let uniqueId = uuidv4();
 
     if (parentTaskId) {
-      const a = Promise.resolve(createSubTask(parentTaskId, description));
-      toast.promise(a, {
-        loading: "Creating sub-task...",
-        error: "Error while creating sub-task.",
-        success: "New sub-task created.",
-      });
+      createSubTask(parentTaskId, description);
       return;
     }
     createTask(uniqueId);
@@ -96,20 +91,24 @@ export default function TaskForm({
           initial={"closed"}
           animate={isOpen ? "open" : "closed"}
           exit={"closed"}
-          className="w-full mx-auto transition-transform h-24 flex space-x-2"
+          className={`w-full mx-auto transition-transform ${
+            subtaskMode ? "h-16" : "h-24"
+          } flex space-x-2`}
           id="task_form_container"
         >
           <input
             ref={inputRef}
             value={title}
-            placeholder="New task title"
+            placeholder={`${subtaskMode ? "New activity" : "New task"}`}
             onChange={(e) => {
               e.preventDefault();
               setTitle(e.target.value);
               e.stopPropagation();
             }}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && create(title)}
-            className="text-slate-900 placeholder:text-placeholder placeholder:font-semibold text-center flex items-center dark:text-white py-2 px-4 text-md resize-none w-10/12 h-full bg-white border-2 dark:border-none dark:bg-brand-dark rounded-l-xl rounded-r-md"
+            className={`text-slate-900 placeholder:text-placeholder placeholder:font-semibold text-center flex items-center dark:text-white py-2 px-4 text-md resize-none w-10/12 h-full border-2 dark:border-none bg-white ${
+              subtaskMode ? "dark:bg-brand-darkest" : "dark:bg-brand-dark"
+            } rounded-l-xl rounded-r-md`}
           ></input>
           <motion.button
             onClick={() => create(title)}
