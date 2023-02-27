@@ -42,7 +42,7 @@ export default function TaskList() {
       animate={"idle"}
       exit={"exit"}
       variants={taskCardVariants}
-      className="relative h-[652px] w-full sm:max-w-lg lg:max-w-full flex flex-col space-y-2 mx-auto lg:mr-4"
+      className="relative h-[552px] lg:h-[652px] w-full sm:max-w-lg lg:max-w-full flex flex-col space-y-2 mx-auto lg:mr-4"
     >
       <div className="hidden lg:flex pb-[0.35rem]">
         <TaskForm></TaskForm>

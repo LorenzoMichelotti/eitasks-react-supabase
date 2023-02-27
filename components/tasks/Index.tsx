@@ -118,7 +118,7 @@ export default function Tasks({ session }: { session: Session }) {
         </div>
         <div className="grid grid-cols-1 pb-4 gap-4 mx-4 lg:grid-cols-2 xl:grid-cols-3">
           <div></div>
-          <div className="w-full flex justify-center">
+          <div className="w-full z-0 pb-12 flex justify-center">
             <Pagination
               onChange={getPage}
               total={Math.ceil(taskCount / 5)}
@@ -127,9 +127,9 @@ export default function Tasks({ session }: { session: Session }) {
           </div>
         </div>
 
-        <div className="flex lg:hidden">
+        <div className="flex z-10 lg:hidden">
           <div className="pb-60 lg:pb-0"></div>
-          <div className="fixed z-10 flex flex-col space-y-4 bottom-0 p-4 pb-12 pt-6 w-full bg-brand-darkest">
+          <div className="fixed flex flex-col space-y-4 bottom-0 p-4 pb-12 pt-6 w-full bg-brand-darkest">
             <TaskForm></TaskForm>
             <BottomNavigation></BottomNavigation>
           </div>
