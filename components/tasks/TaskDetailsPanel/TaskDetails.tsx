@@ -1,10 +1,8 @@
 import useTaskStore from "@/hooks/UseTaskStore";
-import Task from "@/models/Task";
+import supabase from "@/services/supabaseClient";
 import { MinusIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { AnimatePresence, motion } from "framer-motion";
-import moment from "moment";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import TaskEditor from "./TaskEditor";
 import TaskReader from "./TaskReader";
@@ -35,7 +33,7 @@ export default function TaskDetails() {
   function deleteTask(taskId?: number, closeDetails?: boolean) {
     if (!taskId) return toast.error("Invalid task");
     if (profile) {
-      removeTask(taskId, profile?.id);
+      removeTask(taskId, profile?.id, supabase);
       if (closeDetails) setActiveTask();
     } else {
       return toast.error("Invalid profile");

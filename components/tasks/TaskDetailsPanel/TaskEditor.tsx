@@ -1,23 +1,26 @@
 import useTaskStore from "@/hooks/UseTaskStore";
 import Task from "@/models/Task";
 import { Pencil1Icon } from "@radix-ui/react-icons";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { animate, motion } from "framer-motion";
 import { FormEvent, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function TaskEditor({
   handleCloseEditor,
-  handleOpenEditor,
 }: {
   handleCloseEditor: () => void;
   handleOpenEditor: () => void;
 }) {
   const [formTitle, setFormTitle] = useState("");
   const [formDescription, setFormDescription] = useState("");
+  const supabase = useSupabaseClient();
 
-  const { activeTask, updateTask } = useTaskStore((state) => ({
+  const { activeTask, updateTask, tasks, setTasks } = useTaskStore((state) => ({
     activeTask: state.activeTask,
     updateTask: state.updateTask,
+    tasks: state.tasks,
+    setTasks: state.setTasks,
   }));
 
   function resetFields() {
@@ -36,8 +39,16 @@ export default function TaskEditor({
     const updatedTask: Task = { ...activeTask };
     updatedTask.description = formDescription;
     updatedTask.title = formTitle;
-
-    updateTask(updatedTask);
+    // optimistic update
+    const updatedTasks = [...tasks];
+    updatedTasks.splice(
+      updatedTasks.findIndex((t) => t.id === updatedTask.id),
+      1,
+      updatedTask
+    );
+    setTasks(updatedTasks);
+    // database update
+    updateTask(updatedTask, supabase);
     resetFields();
     handleCloseEditor();
     e.stopPropagation();
@@ -101,7 +112,7 @@ export default function TaskEditor({
           <input
             onClick={() => {
               resetFields();
-              handleOpenEditor();
+              handleCloseEditor();
             }}
             value={"CANCEL"}
             type={"button"}

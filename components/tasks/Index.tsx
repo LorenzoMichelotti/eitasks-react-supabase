@@ -57,7 +57,8 @@ export default function Tasks({ session }: { session: Session }) {
   }, []);
 
   function getPage(page: number) {
-    if (profile) loadTasks(profile, supabase, page, 5);
+    if (!profile) return;
+    loadTasks(profile, supabase, page, 5);
   }
 
   const cardVariants = {

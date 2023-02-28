@@ -1,6 +1,6 @@
 import Profile from "@/models/Profile";
 import Task, { CreateTask } from "@/models/Task";
-import supabase from "@/services/supabaseClient";
+// import supabase from "@/services/supabaseClient";
 import { SupabaseClient } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
 import { create } from "zustand";
@@ -17,14 +17,25 @@ interface TaskState {
     maxPerPage?: number
   ) => void;
   setTasks: (tasks: Task[]) => void;
-  addTask: (task: CreateTask) => void;
-  removeTask: (taskId: number, profileId: number) => void;
+  addTask: (
+    task: CreateTask,
+    supabase: SupabaseClient<any, "public", any>
+  ) => void;
+  removeTask: (
+    taskId: number,
+    profileId: number,
+    supabase: SupabaseClient<any, "public", any>
+  ) => void;
   profile?: Profile;
   loadProfile: (profile: Profile) => void;
-  updateTask: (task: Task) => void;
+  updateTask: (
+    task: Task,
+    supabase: SupabaseClient<any, "public", any>
+  ) => void;
   getSubtasks: (
     taskId: number,
-    profileId: number
+    profileId: number,
+    supabase: SupabaseClient<any, "public", any>
   ) => Promise<{ subtasks: Task[]; count: number }>;
 }
 
@@ -34,9 +45,16 @@ const useTaskStore = create<TaskState>((set) => ({
   setActiveTask: (task?: Task) => {
     set((state) => ({ ...state, activeTask: task || undefined }));
   },
-  updateTask: async (task: Task) => updateTask(task),
-  removeTask: async (taskId: number, profileId: number) => {
-    removeTask(taskId, profileId);
+  updateTask: async (
+    task: Task,
+    supabase: SupabaseClient<any, "public", any>
+  ) => updateTask(task, supabase),
+  removeTask: async (
+    taskId: number,
+    profileId: number,
+    supabase: SupabaseClient<any, "public", any>
+  ) => {
+    removeTask(taskId, profileId, supabase);
     set((state) => {
       const updatedTasks = [...state.tasks];
       updatedTasks.splice(
@@ -46,13 +64,17 @@ const useTaskStore = create<TaskState>((set) => ({
       return { ...state, tasks: updatedTasks };
     });
   },
-  addTask: async (task: CreateTask) => createTask(task),
+  addTask: async (
+    task: CreateTask,
+    supabase: SupabaseClient<any, "public", any>
+  ) => createTask(task, supabase),
   load: async (
     profile: Profile,
     supabase: SupabaseClient<any, "public", any>,
     page: number = 1,
     maxPerPage: number = 5
   ) => {
+    console.log("loading...");
     const data = await load(profile, supabase, page, maxPerPage);
     if (data)
       set((state: TaskState) => {
@@ -64,14 +86,14 @@ const useTaskStore = create<TaskState>((set) => ({
           return {
             ...state,
             tasks: data.tasks,
-            taskCount: data.count ?? 0,
+            taskCount: data.count,
             activeTask: updatedActiveTask,
           };
         } else
           return {
             ...state,
             tasks: data.tasks,
-            taskCount: data.count ?? 0,
+            taskCount: data.count,
           };
       });
   },
@@ -83,8 +105,11 @@ const useTaskStore = create<TaskState>((set) => ({
   },
   loadProfile: (profile: Profile) =>
     set((state: TaskState) => ({ ...state, profile })),
-  getSubtasks: (taskId: number, profileId: number) =>
-    getSubtasks(taskId, profileId),
+  getSubtasks: (
+    taskId: number,
+    profileId: number,
+    supabase: SupabaseClient<any, "public", any>
+  ) => getSubtasks(taskId, profileId, supabase),
 }));
 
 async function load(
@@ -94,9 +119,12 @@ async function load(
   maxPerPage: number = 5
 ) {
   let maxRange = maxPerPage;
+  let startRange = page - 1;
   if (page === 1) {
     maxRange -= 1;
   }
+  startRange = startRange * maxRange;
+  maxRange = (page - 1) * maxRange + maxRange;
 
   let {
     data: tasks,
@@ -105,10 +133,10 @@ async function load(
   } = await supabase
     .from("tasks")
     .select("*", { count: "exact" })
-    .eq("profileId", profile?.id)
+    .eq("profileId", profile.id)
     .is("parentTaskId", null)
     .order("created_at", { ascending: false })
-    .range((page - 1) * maxRange, maxRange);
+    .range(startRange, maxRange);
 
   if (error) {
     console.log(error);
@@ -127,10 +155,14 @@ async function load(
 
   console.log("tasks loaded successfully");
 
-  return { tasks: tasks as Task[], count: count };
+  return { tasks: tasks as Task[], count: count ?? 0 };
 }
 
-async function removeTask(taskId: number, profileId: number) {
+async function removeTask(
+  taskId: number,
+  profileId: number,
+  supabase: SupabaseClient<any, "public", any>
+) {
   if (!taskId || !profileId) {
     toast.error("Error deleting task!");
     return;
@@ -147,7 +179,10 @@ async function removeTask(taskId: number, profileId: number) {
   return;
 }
 
-async function createTask(task: CreateTask) {
+async function createTask(
+  task: CreateTask,
+  supabase: SupabaseClient<any, "public", any>
+) {
   if (!task) {
     toast.error("Error creating task!");
     return;
@@ -168,7 +203,10 @@ async function createTask(task: CreateTask) {
   return toast.success("The task was created", { id: "create-task-toast" });
 }
 
-async function updateTask(task: Task) {
+async function updateTask(
+  task: Task,
+  supabase: SupabaseClient<any, "public", any>
+) {
   if (!task) return toast.error("Error updating task!");
   const { error } = await supabase
     .from("tasks")
@@ -180,15 +218,13 @@ async function updateTask(task: Task) {
     })
     .eq("id", task.id);
   if (error) return toast.error("Error updating task!");
-  else
-    return toast.success("The task was updated.", {
-      id: "updating-task-toast",
-    });
+  else console.log("The task was updated.");
 }
 
 async function getSubtasks(
   taskId: number,
-  profileId: number
+  profileId: number,
+  supabase: SupabaseClient<any, "public", any>
 ): Promise<{ subtasks: Task[]; count: number }> {
   let {
     data: subtasks,

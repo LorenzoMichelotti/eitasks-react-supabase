@@ -1,5 +1,6 @@
 import useTaskStore from "@/hooks/UseTaskStore";
 import Task, { CreateTask } from "@/models/Task";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
@@ -11,14 +12,17 @@ export default function TaskForm({
   isOpen = true,
   setIsOpen,
   subtaskMode = false,
+  triggerCreating,
 }: {
   parentTaskId?: number;
   isOpen?: boolean;
   setIsOpen?: Dispatch<SetStateAction<boolean>>;
   subtaskMode?: boolean;
+  triggerCreating?: (isSubtask: boolean) => void;
 }) {
   const [title, setTitle] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const supabase = useSupabaseClient();
 
   const { addTask, profile, setTasks, tasks } = useTaskStore((state) => ({
     addTask: state.addTask,
@@ -49,6 +53,7 @@ export default function TaskForm({
   }
 
   function createTask(uniqueId: string) {
+    if (triggerCreating) triggerCreating(false);
     if (!profile) {
       toast.error("Profile error");
       return;
@@ -58,12 +63,13 @@ export default function TaskForm({
       progress: 0,
       profileId: profile.id,
     };
-    addTask(newTask);
+    addTask(newTask, supabase);
     setTitle("");
   }
 
   function createSubTask(parentTaskId: number, description: string) {
     console.log("Creating subtask...");
+    if (triggerCreating) triggerCreating(true);
     if (!profile) {
       console.log("Profile error");
       toast.error("Profile error");
@@ -76,7 +82,7 @@ export default function TaskForm({
       profileId: profile.id,
     };
     // update database
-    addTask(subtask);
+    addTask(subtask, supabase);
     setIsOpen && setIsOpen(false);
     setTitle("");
   }

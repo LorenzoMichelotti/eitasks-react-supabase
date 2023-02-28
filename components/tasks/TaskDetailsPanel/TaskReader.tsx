@@ -1,17 +1,21 @@
 import useTaskStore from "@/hooks/UseTaskStore";
 import Task from "@/models/Task";
 import { TrashIcon } from "@radix-ui/react-icons";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { motion } from "framer-motion";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import TaskForm from "../TaskForm";
+import SubtaskCard from "./SubtaskCard";
 
 export default function TaskReader({
   deleteTask,
 }: {
   deleteTask: (taskId?: number, closeDetails?: boolean) => void;
 }) {
+  const supabase = useSupabaseClient();
   const [subtasks, setSubtasks] = useState<Task[]>([]);
+  const [creatingSubtask, setCreatingSubtask] = useState<boolean>(false);
   const { activeTask, updateTask, setTasks, getSubtasks, profile, tasks } =
     useTaskStore((state) => ({
       activeTask: state.activeTask,
@@ -34,12 +38,7 @@ export default function TaskReader({
       1,
       updatedSubtask
     );
-    updatedTasks.splice(
-      tasks.findIndex((t) => t.id === updatedSubtask.id),
-      1,
-      updatedSubtask
-    );
-    // optimistically update the parent task's progress
+    // optimistically update the parent task
     const parentTask = tasks.find((t) => t.id === subtask.parentTaskId);
     const updatedProgress =
       (updatedSubtasks.filter((t) => t.completed).length * 100) /
@@ -56,20 +55,37 @@ export default function TaskReader({
     setTasks(updatedTasks);
     setSubtasks(updatedSubtasks);
     // database update
-    updateTask(updatedParentTask);
-    updateTask(updatedSubtask);
+    updateTask(updatedParentTask, supabase);
+    updateTask(updatedSubtask, supabase);
   }
 
   async function loadSubtasks() {
     if (!activeTask || !profile) return;
-    const resp = await getSubtasks(activeTask.id, profile.id);
+    const resp = await getSubtasks(activeTask.id, profile.id, supabase);
     setSubtasks(resp.subtasks);
+  }
+
+  function handleDeleteSubtask(subtaskId: number) {
+    const updatedSubtasks = [...subtasks];
+    updatedSubtasks.splice(
+      updatedSubtasks.findIndex((t) => t.id === subtaskId),
+      1
+    );
+    setSubtasks(updatedSubtasks);
+    deleteTask(subtaskId);
   }
 
   useEffect(() => {
     console.log("activeTask changed");
     loadSubtasks();
+    setCreatingSubtask(false);
   }, [activeTask]);
+
+  function handleCreating(isSubtask: boolean) {
+    if (isSubtask) {
+      setCreatingSubtask(true);
+    }
+  }
 
   if (activeTask)
     return (
@@ -90,28 +106,19 @@ export default function TaskReader({
         <p>{activeTask.description}</p>
         <div className="flex flex-col w-full">
           {/* subtasks */}
-          <TaskForm parentTaskId={activeTask.id} subtaskMode={true} />
+          <TaskForm
+            triggerCreating={handleCreating}
+            parentTaskId={activeTask.id}
+            subtaskMode={true}
+          />
           <div className="flex max-h-64 overflow-auto flex-col space-y-1 mt-4">
             {subtasks.map((subtask) => (
-              <div
+              <SubtaskCard
+                subtask={subtask}
+                toggleSubtask={toggleSubtask}
                 key={subtask.id}
-                className="flex p-2 px-4 items-center justify-between hover:bg-brand-medium rounded-lg"
-              >
-                <div className="flex space-x-4">
-                  <input
-                    type="checkbox"
-                    onChange={() => toggleSubtask(subtask)}
-                    checked={subtask.completed}
-                  />
-                  <span>{subtask.title}</span>
-                </div>
-                <button
-                  onClick={() => deleteTask(subtask.id)}
-                  className="hover:text-pink-500 w-8 h-8 flex justify-center items-center rounded-full"
-                >
-                  <TrashIcon></TrashIcon>
-                </button>
-              </div>
+                handleDeleteSubtask={handleDeleteSubtask}
+              ></SubtaskCard>
             ))}
           </div>
         </div>
