@@ -11,14 +11,14 @@ import TaskReader from "./TaskReader";
 
 export default function TaskDetails() {
   const [isEditing, setIsEditing] = useState(false);
-  const { activeTask, setActiveTask, updateTask, profile, removeTask } =
-    useTaskStore((state) => ({
+  const { activeTask, setActiveTask, profile, removeTask } = useTaskStore(
+    (state) => ({
       activeTask: state.activeTask,
       setActiveTask: state.setActiveTask,
-      updateTask: state.updateTask,
       profile: state.profile,
       removeTask: state.removeTask,
-    }));
+    })
+  );
 
   function handleToggleEditor() {
     setIsEditing((prev) => !prev);

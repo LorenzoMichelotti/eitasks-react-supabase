@@ -40,11 +40,11 @@ export default function TaskCard({
               exit={{ scale: 0, opacity: 0 }}
               key={"task-selection-box"}
               layout
-              className="absolute border-4 border-brand-light w-[103%] h-[115%] rounded-2xl -left-2 -top-2"
+              className="absolute pointer-events-none border-4 border-brand-light w-[103%] h-[115%] rounded-2xl -left-2 -top-2"
             ></motion.div>
           )}
         </AnimatePresence>
-        <div className="w-full flex group justify-start items-center">
+        <div className="w-full flex justify-start items-center">
           <div
             className={`flex m-0 w-full flex-col rounded-2xl items-start shadow-lg border-2 border-black/50 justify-start bg-white dark:bg-[#1B1B22] h-[102px] p-2 md:p-4`}
           >

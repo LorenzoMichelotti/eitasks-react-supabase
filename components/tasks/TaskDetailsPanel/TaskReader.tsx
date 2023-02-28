@@ -12,24 +12,52 @@ export default function TaskReader({
   deleteTask: (taskId?: number, closeDetails?: boolean) => void;
 }) {
   const [subtasks, setSubtasks] = useState<Task[]>([]);
-  const { activeTask, updateTask, getSubtasks, profile } = useTaskStore(
-    (state) => ({
+  const { activeTask, updateTask, setTasks, getSubtasks, profile, tasks } =
+    useTaskStore((state) => ({
       activeTask: state.activeTask,
       tasks: state.tasks,
       updateTask: state.updateTask,
       getSubtasks: state.getSubtasks,
       profile: state.profile,
-    })
-  );
+      setTasks: state.setTasks,
+    }));
 
   function toggleSubtask(subtask: Task) {
     if (!activeTask) return;
-    subtask.completed = !subtask.completed;
+    const updatedTasks = [...tasks];
+    // optimistically update the subtask
+    const updatedSubtasks = [...subtasks];
+    const updatedSubtask = { ...subtask };
+    updatedSubtask.completed = !updatedSubtask.completed;
+    updatedSubtasks.splice(
+      updatedSubtasks.findIndex((t) => t.id === updatedSubtask.id),
+      1,
+      updatedSubtask
+    );
+    updatedTasks.splice(
+      tasks.findIndex((t) => t.id === updatedSubtask.id),
+      1,
+      updatedSubtask
+    );
+    // optimistically update the parent task's progress
+    const parentTask = tasks.find((t) => t.id === subtask.parentTaskId);
     const updatedProgress =
-      (subtasks.filter((t) => t.completed).length * 100) / subtasks.length;
-    activeTask.progress = Math.round(updatedProgress);
-    updateTask(activeTask);
-    updateTask(subtask);
+      (updatedSubtasks.filter((t) => t.completed).length * 100) /
+      updatedSubtasks.length;
+    if (!parentTask) return;
+    const updatedParentTask = { ...parentTask };
+    updatedParentTask.progress = Math.round(updatedProgress);
+    updatedTasks.splice(
+      tasks.findIndex((t) => t.id === updatedParentTask.id),
+      1,
+      updatedParentTask
+    );
+    // optimistic update
+    setTasks(updatedTasks);
+    setSubtasks(updatedSubtasks);
+    // database update
+    updateTask(updatedParentTask);
+    updateTask(updatedSubtask);
   }
 
   async function loadSubtasks() {
@@ -39,6 +67,7 @@ export default function TaskReader({
   }
 
   useEffect(() => {
+    console.log("activeTask changed");
     loadSubtasks();
   }, [activeTask]);
 
@@ -50,7 +79,11 @@ export default function TaskReader({
         exit={{ opacity: 0, transition: { duration: 0.1 } }}
         className="flex flex-col space-y-2"
       >
-        <h1 className="text-2xl font-bold">{activeTask.title}</h1>
+        <h1 className="text-2xl font-bold">
+          {" "}
+          <span className="text-brand-lightest mr-2">[ #{activeTask.id} ]</span>
+          {activeTask.title}
+        </h1>
         <span className="text-sm text-brand-lightest">
           {moment(activeTask.created_at).format("MMM Do YY")}
         </span>

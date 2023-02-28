@@ -56,24 +56,29 @@ const useTaskStore = create<TaskState>((set) => ({
     const data = await load(profile, supabase, page, maxPerPage);
     if (data)
       set((state: TaskState) => {
-        // const currentActiveTask = state.activeTask;
-        // let updatedActiveTask;
-        // if (currentActiveTask)
-        //   updatedActiveTask = data.tasks?.find(
-        //     (t) => t.id === currentActiveTask.id
-        //   );
-        return {
-          ...state,
-          tasks: data.tasks,
-          taskCount: data.count ?? 0,
-          // activeTask: updatedActiveTask,
-        };
+        const currentActiveTask = state.activeTask;
+        if (currentActiveTask) {
+          const updatedActiveTask = data.tasks?.find(
+            (t) => t.id === currentActiveTask.id
+          );
+          return {
+            ...state,
+            tasks: data.tasks,
+            taskCount: data.count ?? 0,
+            activeTask: updatedActiveTask,
+          };
+        } else
+          return {
+            ...state,
+            tasks: data.tasks,
+            taskCount: data.count ?? 0,
+          };
       });
   },
   setTasks: (tasks: Task[]) => {
     set((state: TaskState) => ({
       ...state,
-      tasks,
+      tasks: tasks,
     }));
   },
   loadProfile: (profile: Profile) =>

@@ -28,7 +28,7 @@ export default function Slider2({
       >
         <Slider.Track className="relative overflow-clip flex-grow bg-black/50 h-6 w-full rounded-full">
           <Slider.Range
-            className={`absolute rounded-full h-full ${
+            className={`absolute transition-all rounded-full h-full ${
               value > 85
                 ? "bg-[#34d399]"
                 : value > 60

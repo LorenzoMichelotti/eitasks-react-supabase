@@ -20,11 +20,11 @@ export default function NavBar({
         <div className="hidden lg:block absolute left-1/2 -translate-x-1/2">
           <BottomNavigation></BottomNavigation>
         </div>
-        {/* <li className="text-gray-500">
+        <li className="text-gray-500">
           <button onClick={() => supabase.auth.signOut()}>
             {profile?.username || profile?.email}
           </button>
-        </li> */}
+        </li>
       </ul>
     </div>
   );

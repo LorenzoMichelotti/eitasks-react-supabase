@@ -1,5 +1,5 @@
 import useTaskStore from "@/hooks/UseTaskStore";
-import { CreateTask } from "@/models/Task";
+import Task, { CreateTask } from "@/models/Task";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
@@ -20,9 +20,11 @@ export default function TaskForm({
   const [title, setTitle] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { addTask, profile } = useTaskStore((state) => ({
+  const { addTask, profile, setTasks, tasks } = useTaskStore((state) => ({
     addTask: state.addTask,
     profile: state.profile,
+    setTasks: state.setTasks,
+    tasks: state.tasks,
   }));
 
   function create(description: string) {
@@ -73,6 +75,7 @@ export default function TaskForm({
       parentTaskId: parentTaskId,
       profileId: profile.id,
     };
+    // update database
     addTask(subtask);
     setIsOpen && setIsOpen(false);
     setTitle("");
