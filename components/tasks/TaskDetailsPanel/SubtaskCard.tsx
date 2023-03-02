@@ -20,7 +20,7 @@ export default function SubtaskCard({
         className="flex items-center w-full px-4 py-2 h-full rounded-l-lg cursor-pointer space-x-4"
       >
         <input type="checkbox" readOnly checked={subtask.completed} />
-        <span>{subtask.title}</span>
+        <span className="text-left">{subtask.title}</span>
       </button>
       <button
         onClick={() => handleDeleteSubtask(subtask.id)}
