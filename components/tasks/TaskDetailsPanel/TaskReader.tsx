@@ -66,13 +66,37 @@ export default function TaskReader({
   }
 
   function handleDeleteSubtask(subtaskId: number) {
+    // optimistically update the subtask
     const updatedSubtasks = [...subtasks];
+    const parentTaskId = updatedSubtasks.find(
+      (t) => t.id === subtaskId
+    )?.parentTaskId;
     updatedSubtasks.splice(
       updatedSubtasks.findIndex((t) => t.id === subtaskId),
       1
     );
     setSubtasks(updatedSubtasks);
+    // update the subtask
     deleteTask(subtaskId);
+    // optimistically update the parent task
+    if (!parentTaskId) return;
+    const updatedTasks = [...tasks];
+    console.log("updating parent task");
+    const parentTask = tasks.find((t) => t.id === parentTaskId);
+    const updatedProgress =
+      (updatedSubtasks.filter((t) => t.completed).length * 100) /
+      updatedSubtasks.length;
+    if (!parentTask) return;
+    const updatedParentTask = { ...parentTask };
+    updatedParentTask.progress = Math.round(updatedProgress);
+    updatedTasks.splice(
+      tasks.findIndex((t) => t.id === parentTaskId),
+      1,
+      updatedParentTask
+    );
+    setTasks(updatedTasks);
+    // update the parent task
+    updateTask(updatedParentTask, supabase);
   }
 
   useEffect(() => {

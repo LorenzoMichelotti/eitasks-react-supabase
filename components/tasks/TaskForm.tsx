@@ -24,12 +24,15 @@ export default function TaskForm({
   const inputRef = useRef<HTMLInputElement>(null);
   const supabase = useSupabaseClient();
 
-  const { addTask, profile, setTasks, tasks } = useTaskStore((state) => ({
-    addTask: state.addTask,
-    profile: state.profile,
-    setTasks: state.setTasks,
-    tasks: state.tasks,
-  }));
+  const { addTask, profile, getSubtasks, tasks, setTasks, updateTask } =
+    useTaskStore((state) => ({
+      addTask: state.addTask,
+      profile: state.profile,
+      getSubtasks: state.getSubtasks,
+      tasks: state.tasks,
+      setTasks: state.setTasks,
+      updateTask: state.updateTask,
+    }));
 
   function create(description: string) {
     if (description.trim() == "") {
@@ -67,7 +70,26 @@ export default function TaskForm({
     setTitle("");
   }
 
-  function createSubTask(parentTaskId: number, description: string) {
+  async function createSubTask(parentTaskId: number, description: string) {
+    if (!profile) return;
+    // task
+    const { subtasks } = await getSubtasks(parentTaskId, profile.id, supabase);
+    const updatedTasks = [...tasks];
+    const parentTask = updatedTasks.find((t) => t.id === parentTaskId);
+    const updatedProgress =
+      (subtasks.filter((t) => t.completed).length * 100) /
+      (subtasks.length + 1);
+    if (!parentTask) return;
+    const updatedParentTask = { ...parentTask };
+    updatedParentTask.progress = Math.round(updatedProgress);
+    updatedTasks.splice(
+      tasks.findIndex((t) => t.id === updatedParentTask.id),
+      1,
+      updatedParentTask
+    );
+    setTasks(updatedTasks);
+    updateTask(updatedParentTask, supabase);
+    // subtask
     console.log("Creating subtask...");
     if (triggerCreating) triggerCreating(true);
     if (!profile) {
@@ -86,6 +108,28 @@ export default function TaskForm({
     setIsOpen && setIsOpen(false);
     setTitle("");
   }
+
+  // function recalculateTaskProgress() {
+  //   // optimistically update the parent task
+  //   if (!parentTaskId) return;
+  //   const updatedTasks = [...tasks];
+  //   console.log("updating parent task");
+  //   const parentTask = tasks.find((t) => t.id === parentTaskId);
+  //   const updatedProgress =
+  //     (updatedSubtasks.filter((t) => t.completed).length * 100) /
+  //     updatedSubtasks.length;
+  //   if (!parentTask) return;
+  //   const updatedParentTask = { ...parentTask };
+  //   updatedParentTask.progress = Math.round(updatedProgress);
+  //   updatedTasks.splice(
+  //     tasks.findIndex((t) => t.id === parentTaskId),
+  //     1,
+  //     updatedParentTask
+  //   );
+  //   setTasks(updatedTasks);
+  //   // update the parent task
+  //   updateTask(updatedParentTask, supabase);
+  // }
 
   const formVariant = {
     closed: { y: -20, opacity: 0, transition: { duration: 0.2 } },
