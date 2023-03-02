@@ -33,8 +33,10 @@ export default function TaskDetails() {
   function deleteTask(taskId?: number, closeDetails?: boolean) {
     if (!taskId) return toast.error("Invalid task");
     if (profile) {
-      removeTask(taskId, profile?.id, supabase);
-      if (closeDetails) setActiveTask();
+      if (closeDetails) {
+        removeTask(taskId, profile?.id, supabase);
+        setActiveTask();
+      } else removeTask(taskId, profile?.id, supabase, true);
     } else {
       return toast.error("Invalid profile");
     }

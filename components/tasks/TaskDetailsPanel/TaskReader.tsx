@@ -76,7 +76,6 @@ export default function TaskReader({
   }
 
   useEffect(() => {
-    console.log("activeTask changed");
     loadSubtasks();
     setCreatingSubtask(false);
   }, [activeTask]);

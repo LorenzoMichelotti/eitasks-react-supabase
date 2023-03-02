@@ -24,7 +24,8 @@ interface TaskState {
   removeTask: (
     taskId: number,
     profileId: number,
-    supabase: SupabaseClient<any, "public", any>
+    supabase: SupabaseClient<any, "public", any>,
+    isSubtask?: boolean
   ) => void;
   profile?: Profile;
   loadProfile: (profile: Profile) => void;
@@ -52,9 +53,11 @@ const useTaskStore = create<TaskState>((set) => ({
   removeTask: async (
     taskId: number,
     profileId: number,
-    supabase: SupabaseClient<any, "public", any>
+    supabase: SupabaseClient<any, "public", any>,
+    isSubtask?: boolean
   ) => {
     removeTask(taskId, profileId, supabase);
+    if (isSubtask) return;
     set((state) => {
       const updatedTasks = [...state.tasks];
       updatedTasks.splice(
@@ -74,7 +77,6 @@ const useTaskStore = create<TaskState>((set) => ({
     page: number = 1,
     maxPerPage: number = 5
   ) => {
-    console.log("loading...");
     const data = await load(profile, supabase, page, maxPerPage);
     if (data)
       set((state: TaskState) => {
@@ -125,6 +127,9 @@ async function load(
   }
   startRange = startRange * maxRange;
   maxRange = (page - 1) * maxRange + maxRange;
+  if (page > 1) {
+    maxRange -= 1;
+  }
 
   let {
     data: tasks,
@@ -149,11 +154,10 @@ async function load(
   }
 
   if (tasks.length < 0) {
+    // if there are no tasks
     console.log("found save data with no tasks to load.");
     return { tasks: [], count: 0 };
   }
-
-  console.log("tasks loaded successfully");
 
   return { tasks: tasks as Task[], count: count ?? 0 };
 }

@@ -5,13 +5,8 @@ import { toast } from "react-hot-toast";
 export async function getProfileData(
   user: User,
   supabase: SupabaseClient<any, "public", any>,
-  loadProfile: (profile: Profile) => void,
-  loadTasks: (
-    profile: Profile,
-    supabase: SupabaseClient<any, "public", any>
-  ) => void
+  loadProfile: (profile: Profile) => void
 ) {
-  console.log("Loading profile data");
   let { data: profile, error } = await supabase
     .from("profiles")
     .select("*")
@@ -33,8 +28,7 @@ export async function getProfileData(
 
   const newProfile: Profile = profile?.shift() as Profile;
   loadProfile(newProfile);
-  loadTasks(newProfile, supabase);
-  return;
+  return newProfile;
 }
 
 export async function createProfileData(
