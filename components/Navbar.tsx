@@ -12,8 +12,8 @@ export default function NavBar({
     profile: state.profile,
   }));
   return (
-    <div className="dark:text-white mt-8 mb-12">
-      <ul className="flex justify-center lg:justify-between lg:mx-8">
+    <div className="dark:text-white mt-8 mb-4 lg:mb-12">
+      <ul className="flex justify-around items-center lg:justify-between lg:mx-8">
         <li className="font-semibold text-[24px] italic">
           <Link href="/">TASKING</Link>
         </li>

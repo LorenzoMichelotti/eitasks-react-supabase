@@ -13,17 +13,26 @@ import TaskForm from "./TaskForm";
 import TaskList from "./TaskList";
 import { Pagination } from "@nextui-org/react";
 import Task from "../../models/Task";
+import Footer from "../Footer";
 
 export default function Tasks({ session }: { session: Session }) {
-  const { tasks, loadTasks, profile, loadProfile, activeTask, taskCount } =
-    useTaskStore((state) => ({
-      tasks: state.tasks,
-      taskCount: state.taskCount,
-      loadTasks: state.load,
-      loadProfile: state.loadProfile,
-      profile: state.profile,
-      activeTask: state.activeTask,
-    }));
+  const {
+    tasks,
+    loadTasks,
+    profile,
+    loadProfile,
+    activeTask,
+    taskCount,
+    setActiveTask,
+  } = useTaskStore((state) => ({
+    tasks: state.tasks,
+    taskCount: state.taskCount,
+    loadTasks: state.load,
+    loadProfile: state.loadProfile,
+    profile: state.profile,
+    activeTask: state.activeTask,
+    setActiveTask: state.setActiveTask,
+  }));
 
   const [currentPage, setCurrentPage] = useState(1);
   const supabase = useSupabaseClient();
@@ -86,7 +95,7 @@ export default function Tasks({ session }: { session: Session }) {
 
   if (user && tasks)
     return (
-      <div className="w-full">
+      <div className="relative w-full -mt-8 pt-8">
         <NavBar supabase={supabase} />
         <div className="grid grid-cols-1 pb-4 gap-4 mx-4 lg:grid-cols-2 xl:grid-cols-3">
           {/* CONTENT CARDS */}
@@ -136,7 +145,7 @@ export default function Tasks({ session }: { session: Session }) {
         </div>
         <div className="grid grid-cols-1 pb-4 gap-4 mx-4 lg:grid-cols-2 xl:grid-cols-3">
           <div></div>
-          <div className="w-full z-0 pb-12 flex justify-center">
+          <div className="w-full z-0 pb-4 lg:pb-12 flex justify-center">
             <Pagination
               onChange={handleSetPage}
               page={currentPage}
@@ -149,39 +158,34 @@ export default function Tasks({ session }: { session: Session }) {
         <div className="flex z-10 lg:hidden">
           <div className="pb-60 lg:pb-0"></div>
           <div className="fixed flex flex-col space-y-4 bottom-0 p-4 pb-12 pt-6 w-full bg-brand-darkest">
+            <AnimatePresence>
+              {activeTask && (
+                <motion.div
+                  initial={{ backdropFilter: "blur(0px)" }}
+                  animate={{ backdropFilter: "blur(16px)" }}
+                  exit={{ backdropFilter: "blur(0px)" }}
+                  className="fixed top-1/2 -translate-y-1/2 flex flex-col items-center justify-end w-full h-full px-4 left-0 backdrop-blur-xl"
+                >
+                  <div className="overflow-auto h-full mt-4 rounded-lg">
+                    <TaskDetails />
+                  </div>
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    onClick={() => setActiveTask()}
+                    className="mt-4 mb-12 py-4 lg:py-12 w-full rounded-lg text-2xl text-brand-lightest bg-brand-medium"
+                  >
+                    CLOSE
+                  </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
             <TaskForm></TaskForm>
             <BottomNavigation></BottomNavigation>
           </div>
         </div>
-
-        <footer className="text-black hidden lg:flex flex-col text-[12px] dark:text-white w-full justify-center mb-12 mt-24 items-center opacity-50 hover:opacity-100">
-          <div className="flex justify-center">
-            <a
-              className="text-black dark:text-white hover:text-blue-500 hover:underline flex space-x-1 items-center"
-              href="https://www.linkedin.com/in/lorenzo-michelotti-b1b4441a7/"
-            >
-              <LinkedInLogoIcon></LinkedInLogoIcon>
-              <span className="whitespace-nowrap flex sm:hidden">
-                LoMichelotti
-              </span>
-              <span className="whitespace-nowrap hidden sm:flex">
-                Lorenzo Michelotti
-              </span>
-            </a>
-            <a
-              className="text-black dark:text-white ml-4 hover:text-blue-500 hover:underline flex space-x-1 items-center"
-              href="https://github.com/LorenzoMichelotti/lolo-tasks"
-            >
-              <GitHubLogoIcon></GitHubLogoIcon>
-              <span className="whitespace-nowrap flex sm:hidden">
-                LoMichelotti
-              </span>
-              <span className="whitespace-nowrap hidden sm:flex">
-                Lorenzo Michelotti
-              </span>
-            </a>
-          </div>
-        </footer>
+        <Footer></Footer>
       </div>
     );
   else return null;

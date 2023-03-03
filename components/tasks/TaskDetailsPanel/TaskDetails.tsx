@@ -47,8 +47,14 @@ export default function TaskDetails() {
   }, [activeTask]);
 
   return (
-    <div className="text-white bg-brand-dark rounded-xl w-full p-4">
-      <div className="w-full flex mb-4">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      layout
+      className="text-white bg-brand-dark rounded-xl w-full p-4"
+    >
+      <motion.div layout className="w-full flex mb-4">
         <div className="w-full flex justify-end space-x-2">
           <button
             onClick={() => deleteTask(activeTask?.id, true)}
@@ -71,9 +77,10 @@ export default function TaskDetails() {
             <MinusIcon></MinusIcon>
           </button>
         </div>
-      </div>
+      </motion.div>
       {activeTask && (
         <motion.div
+          layout
           key={activeTask.id}
           animate={{ opacity: [0, 1], y: [50, 0] }}
           className="w-full flex flex-col space-y-2"
@@ -91,6 +98,6 @@ export default function TaskDetails() {
           </AnimatePresence>
         </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
