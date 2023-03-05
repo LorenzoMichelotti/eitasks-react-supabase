@@ -15,7 +15,7 @@ export default function NavBar({
     <div className="dark:text-white mt-8 mb-4 lg:mb-12">
       <ul className="flex justify-around items-center lg:justify-between lg:mx-8">
         <li className="font-semibold text-[24px] italic">
-          <Link href="/">TASKING</Link>
+          <Link href="/">EITASKS</Link>
         </li>
         <div className="hidden lg:block absolute left-1/2 -translate-x-1/2">
           <BottomNavigation></BottomNavigation>

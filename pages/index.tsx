@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Tasks 2.0</title>
+        <title>eitasks</title>
         <meta name="description" content="A project by Lorenzo Michelotti" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
