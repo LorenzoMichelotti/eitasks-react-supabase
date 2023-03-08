@@ -1,10 +1,11 @@
 import useTaskStore from "@/hooks/UseTaskStore";
+import Response from "@/models/Response";
 import Task from "@/models/Task";
 import { TrashIcon } from "@radix-ui/react-icons";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { motion } from "framer-motion";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TaskForm from "../TaskForm";
 import SubtaskCard from "./SubtaskCard";
 
@@ -13,6 +14,7 @@ export default function TaskReader({
 }: {
   deleteTask: (taskId?: number, closeDetails?: boolean) => void;
 }) {
+  let [thisActiveTaskId, setThisActiveTaskId] = useState(-1);
   const supabase = useSupabaseClient();
   const [subtasks, setSubtasks] = useState<Task[]>([]);
   const [creatingSubtask, setCreatingSubtask] = useState<boolean>(false);
@@ -62,7 +64,8 @@ export default function TaskReader({
   async function loadSubtasks() {
     if (!activeTask || !profile) return;
     const resp = await getSubtasks(activeTask.id, profile.id, supabase);
-    setSubtasks(resp.subtasks);
+    const data = resp;
+    if (resp.model?.subtasks) setSubtasks(resp.model?.subtasks);
   }
 
   function handleDeleteSubtask(subtaskId: number) {
@@ -100,6 +103,8 @@ export default function TaskReader({
   }
 
   useEffect(() => {
+    // if (!activeTask || activeTask.id === thisActiveTaskId) return;
+    // setThisActiveTaskId(activeTask?.id);
     loadSubtasks();
     setCreatingSubtask(false);
   }, [activeTask]);
@@ -116,7 +121,7 @@ export default function TaskReader({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: { duration: 0.1 } }}
         exit={{ opacity: 0, transition: { duration: 0.1 } }}
-        className="flex flex-col space-y-2"
+        className="flex flex-col space-y-2 relative"
       >
         <h1 className="text-2xl font-bold">
           {" "}
@@ -134,15 +139,16 @@ export default function TaskReader({
             parentTaskId={activeTask.id}
             subtaskMode={true}
           />
-          <div className="flex max-h-64 overflow-auto flex-col space-y-1 mt-4">
-            {subtasks.map((subtask) => (
-              <SubtaskCard
-                subtask={subtask}
-                toggleSubtask={toggleSubtask}
-                key={subtask.id}
-                handleDeleteSubtask={handleDeleteSubtask}
-              ></SubtaskCard>
-            ))}
+          <div className="flex lg:max-h-[180px] xl:max-h-[360px] overflow-auto flex-col space-y-1 mt-4">
+            {subtasks &&
+              subtasks.map((subtask) => (
+                <SubtaskCard
+                  subtask={subtask}
+                  toggleSubtask={toggleSubtask}
+                  key={subtask.id}
+                  handleDeleteSubtask={handleDeleteSubtask}
+                ></SubtaskCard>
+              ))}
           </div>
         </div>
       </motion.div>

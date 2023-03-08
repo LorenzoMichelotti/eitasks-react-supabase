@@ -73,12 +73,13 @@ export default function TaskForm({
   async function createSubTask(parentTaskId: number, description: string) {
     if (!profile) return;
     // task
-    const { subtasks } = await getSubtasks(parentTaskId, profile.id, supabase);
+    const { model } = await getSubtasks(parentTaskId, profile.id, supabase);
+    if (!model) return;
     const updatedTasks = [...tasks];
     const parentTask = updatedTasks.find((t) => t.id === parentTaskId);
     const updatedProgress =
-      (subtasks.filter((t) => t.completed).length * 100) /
-      (subtasks.length + 1);
+      (model.subtasks.filter((t) => t.completed).length * 100) /
+      (model.subtasks.length + 1);
     if (!parentTask) return;
     const updatedParentTask = { ...parentTask };
     updatedParentTask.progress = Math.round(updatedProgress);

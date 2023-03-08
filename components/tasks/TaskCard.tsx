@@ -1,7 +1,6 @@
 import useTaskStore from "@/hooks/UseTaskStore";
 import Task from "@/models/Task";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import Slider3 from "../Slider3";
 
 export default function TaskCard({
@@ -26,7 +25,7 @@ export default function TaskCard({
 
   if (task && task.id != undefined)
     return (
-      <motion.div
+      <motion.button
         variants={taskCardVariants}
         key={task.id}
         onClick={handleSetAsActiveTask}
@@ -63,7 +62,7 @@ export default function TaskCard({
             </div>
           </div>
         </div>
-      </motion.div>
+      </motion.button>
     );
   else return null;
 }

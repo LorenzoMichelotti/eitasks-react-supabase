@@ -13,7 +13,7 @@ export default function SubtaskCard({
   return (
     <div
       key={subtask.id}
-      className="flex group items-center justify-between rounded-lg hover:bg-brand-medium"
+      className="flex group items-center justify-between rounded-lg focus:bg-brand-medium hover:bg-brand-medium"
     >
       <button
         onClick={() => toggleSubtask(subtask)}

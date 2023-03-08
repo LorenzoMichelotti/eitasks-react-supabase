@@ -1,8 +1,11 @@
 import Profile from "@/models/Profile";
+import Response from "@/models/Response";
 import Task, { CreateTask } from "@/models/Task";
+import { TrashIcon } from "@radix-ui/react-icons";
 // import supabase from "@/services/supabaseClient";
 import { SupabaseClient } from "@supabase/supabase-js";
-import toast from "react-hot-toast";
+import axios, { AxiosError } from "axios";
+import toast, { IconTheme } from "react-hot-toast";
 import { create } from "zustand";
 
 interface TaskState {
@@ -37,14 +40,17 @@ interface TaskState {
     taskId: number,
     profileId: number,
     supabase: SupabaseClient<any, "public", any>
-  ) => Promise<{ subtasks: Task[]; count: number }>;
+  ) => Promise<Response<{ subtasks: Task[]; count: number }>>;
 }
 
 const useTaskStore = create<TaskState>((set) => ({
   tasks: [],
   taskCount: 0,
   setActiveTask: (task?: Task) => {
-    set((state) => ({ ...state, activeTask: task || undefined }));
+    set((state) => {
+      if (state.activeTask && state.activeTask.id === task?.id) return state;
+      return { ...state, activeTask: task || undefined };
+    });
   },
   updateTask: async (
     task: Task,
@@ -172,14 +178,17 @@ async function removeTask(
     return;
   }
   toast.loading("Deleting task...", { id: "delete-task-toast" });
-  const { data, error } = await supabase
-    .from("tasks")
-    .delete()
-    .eq("id", taskId)
-    .eq("profileId", profileId);
-  if (error)
-    return toast.error("Error deleting task!", { id: "delete-task-toast" });
-  toast.success("The task was deleted", { id: "delete-task-toast" });
+  axios
+    .delete(`/api/tasks/delete/${taskId}`)
+    .then((response) => {
+      const data = response.data;
+      if (!data.success) return toast.error(data.errors[0]);
+      toast.success("The task was deleted", { id: "delete-task-toast" });
+    })
+    .catch((error: AxiosError) => {
+      console.log(error?.code + error.message);
+      toast.error(error?.code + error.message);
+    });
   return;
 }
 
@@ -187,11 +196,8 @@ async function createTask(
   task: CreateTask,
   supabase: SupabaseClient<any, "public", any>
 ) {
-  if (!task) {
-    toast.error("Error creating task!");
-    return;
-  }
-  toast.loading("Creating task...", { id: "create-task-toast" });
+  if (!task)
+    return toast.error("Error creating task!", { id: "create-task-toast" });
 
   let newTask: CreateTask = {
     progress: task.progress,
@@ -201,10 +207,16 @@ async function createTask(
 
   if (task.parentTaskId) newTask.parentTaskId = task.parentTaskId;
 
-  const { error } = await supabase.from("tasks").insert([newTask]);
-  if (error)
-    return toast.error("Error creating task!", { id: "create-task-toast" });
-  return toast.success("The task was created", { id: "create-task-toast" });
+  return axios
+    .post<Response<CreateTask>>(`/api/tasks/post`, newTask)
+    .then((response) => {
+      const data = response.data;
+      if (!data.success) return toast.error(data.errors[0]);
+    })
+    .catch((error: AxiosError) => {
+      console.log(error?.code + error.message);
+      toast.error(error?.code + error.message);
+    });
 }
 
 async function updateTask(
@@ -229,24 +241,18 @@ async function getSubtasks(
   taskId: number,
   profileId: number,
   supabase: SupabaseClient<any, "public", any>
-): Promise<{ subtasks: Task[]; count: number }> {
-  let {
-    data: subtasks,
-    count,
-    error,
-  } = await supabase
-    .from("tasks")
-    .select("*", { count: "exact" })
-    .eq("profileId", profileId)
-    .eq("parentTaskId", taskId)
-    .order("created_at", { ascending: false });
-
-  if (error || !subtasks) {
-    console.log(error);
-    return { subtasks: [], count: 0 };
-  }
-
-  return { subtasks: subtasks as Task[], count: count ?? 0 };
+): Promise<Response<{ subtasks: Task[]; count: number }>> {
+  return axios<Response<{ subtasks: Task[]; count: number }>>(
+    `/api/subtasks/${taskId}/${profileId}`
+  )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error: AxiosError) => {
+      console.log(error?.code + error.message);
+      toast.error(error?.code + error.message);
+      return { errors: [], success: false, model: { subtasks: [], count: 0 } };
+    });
 }
 
 export default useTaskStore;
