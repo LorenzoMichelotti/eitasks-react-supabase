@@ -56,7 +56,7 @@ export default function TaskForm({
     createTask();
   }
 
-  function createTask() {
+  async function createTask() {
     if (!profile) {
       toast.error("Profile error");
       return;
@@ -66,7 +66,7 @@ export default function TaskForm({
       progress: 0,
       profileId: profile.id,
     };
-    addTask(newTask, false);
+    await addTask(newTask, false);
     setTitle("");
     setLoading(false);
   }
