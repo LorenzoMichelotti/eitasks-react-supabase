@@ -1,5 +1,6 @@
 import useTaskStore from "@/hooks/UseTaskStore";
 import Task, { CreateTask } from "@/models/Task";
+import { UpdateIcon } from "@radix-ui/react-icons";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
@@ -157,12 +158,16 @@ export default function TaskForm({
             }}
             className="bg-sky-600 dark:bg-brand-light w-2/12 rounded-r-2xl rounded-l-md shadow-xl flex justify-center items-center"
           >
-            <Image
-              src={"/assets/add.svg"}
-              width={42}
-              height={42}
-              alt="plus icon"
-            ></Image>
+            {loading ? (
+              <UpdateIcon className="animate-spin"></UpdateIcon>
+            ) : (
+              <Image
+                src={"/assets/add.svg"}
+                width={42}
+                height={42}
+                alt="plus icon"
+              ></Image>
+            )}
           </motion.button>
         </motion.div>
       )}
