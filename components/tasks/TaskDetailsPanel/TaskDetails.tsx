@@ -2,12 +2,14 @@ import useTaskStore from "@/hooks/UseTaskStore";
 import supabase from "@/services/supabaseClient";
 import { MinusIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import TaskEditor from "./TaskEditor";
 import TaskReader from "./TaskReader";
 
 export default function TaskDetails() {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const { activeTask, setActiveTask, profile, removeTask } = useTaskStore(
     (state) => ({
@@ -36,6 +38,7 @@ export default function TaskDetails() {
       if (closeDetails) {
         removeTask(taskId, profile?.id, supabase);
         setActiveTask();
+        router.reload();
       } else removeTask(taskId, profile?.id, supabase, true);
     } else {
       return toast.error("Invalid profile");

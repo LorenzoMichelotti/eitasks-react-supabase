@@ -11,11 +11,8 @@ export default function TaskCard({
   canHaveSubtasks?: boolean;
   taskCardVariants: {};
 }) {
-  const { tasks, activeTask, setActiveTask } = useTaskStore((state) => ({
+  const { activeTask, setActiveTask } = useTaskStore((state) => ({
     activeTask: state.activeTask,
-    tasks: state.tasks,
-    removeTask: state.removeTask,
-    profile: state.profile,
     setActiveTask: state.setActiveTask,
   }));
 
