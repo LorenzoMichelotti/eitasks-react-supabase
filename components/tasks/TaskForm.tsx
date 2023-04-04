@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { v4 as uuidv4 } from "uuid";
 
 export default function TaskForm({
   parentTaskId,
@@ -20,6 +19,7 @@ export default function TaskForm({
   subtaskMode?: boolean;
   triggerSubtaskCreated?: (task: Task) => void;
 }) {
+  const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const supabase = useSupabaseClient();
@@ -46,16 +46,16 @@ export default function TaskForm({
       return;
     }
 
-    let uniqueId = uuidv4();
+    setLoading(true);
 
     if (parentTaskId) {
       createSubTask(parentTaskId, description);
       return;
     }
-    createTask(uniqueId);
+    createTask();
   }
 
-  function createTask(uniqueId: string) {
+  function createTask() {
     if (!profile) {
       toast.error("Profile error");
       return;
@@ -67,6 +67,7 @@ export default function TaskForm({
     };
     addTask(newTask, false);
     setTitle("");
+    setLoading(false);
   }
 
   async function createSubTask(parentTaskId: number, description: string) {
@@ -107,6 +108,7 @@ export default function TaskForm({
     if (newTask && triggerSubtaskCreated) triggerSubtaskCreated(newTask);
     setIsOpen && setIsOpen(false);
     setTitle("");
+    setLoading(false);
   }
 
   const formVariant = {
@@ -128,6 +130,7 @@ export default function TaskForm({
           id="task_form_container"
         >
           <input
+            disabled={loading}
             ref={inputRef}
             value={title}
             placeholder={`${subtaskMode ? "New activity" : "New task"}`}
@@ -137,7 +140,7 @@ export default function TaskForm({
               e.stopPropagation();
             }}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && create(title)}
-            className={`text-slate-900 placeholder:text-placeholder placeholder:font-semibold text-center flex items-center dark:text-white py-2 px-4 text-md resize-none w-10/12 h-full border-2 dark:border-none bg-white ${
+            className={`text-slate-900 disabled:opacity-50 placeholder:text-placeholder placeholder:font-semibold text-center flex items-center dark:text-white py-2 px-4 text-md resize-none w-10/12 h-full border-2 dark:border-none bg-white ${
               subtaskMode ? "dark:bg-brand-darkest" : "dark:bg-brand-dark"
             } rounded-l-xl rounded-r-md`}
           ></input>

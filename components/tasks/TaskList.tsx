@@ -48,9 +48,14 @@ export default function TaskList() {
         <TaskForm></TaskForm>
       </div>
       <AnimatePresence>
-        {tasks?.map((task, key) => (
-          <TaskCard taskCardVariants={taskCardVariants} task={task} key={key} />
-        ))}
+        {tasks.length > 0 &&
+          tasks?.map((task, key) => (
+            <TaskCard
+              taskCardVariants={taskCardVariants}
+              task={task}
+              key={key}
+            />
+          ))}
       </AnimatePresence>
     </motion.div>
   );
