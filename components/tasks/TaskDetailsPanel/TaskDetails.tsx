@@ -54,7 +54,7 @@ export default function TaskDetails() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       layout
-      className="text-white max-h-[120%] bg-brand-dark rounded-xl w-full p-4"
+      className="text-white h-full max-h-[120%] bg-brand-dark rounded-xl w-full p-4"
     >
       <motion.div layout className="w-full flex mb-4">
         <div className="w-full flex justify-end space-x-2">

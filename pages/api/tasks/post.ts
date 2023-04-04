@@ -1,5 +1,5 @@
 import Response from "@/models/Response";
-import { CreateTask } from "@/models/Task";
+import Task, { CreateTask } from "@/models/Task";
 import supabase from "@/services/supabaseClient";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -9,7 +9,7 @@ interface ExtendedNextApiRequest extends NextApiRequest {
 
 export default async function handler(
   req: ExtendedNextApiRequest,
-  res: NextApiResponse<Response<CreateTask>>
+  res: NextApiResponse<Response<Task[]>>
 ) {
   if (req.method !== "POST") return res.status(405);
 
@@ -17,11 +17,11 @@ export default async function handler(
   if (!newTask)
     return res.status(400).json({ success: false, errors: ["Invalid data!"] });
 
-  const { error } = await supabase.from("tasks").insert(newTask);
+  const { data, error } = await supabase.from("tasks").insert(newTask).select();
   if (error)
     return res
       .status(500)
       .json({ success: false, errors: ["Error inserting task!"] });
 
-  res.status(200).json({ success: true, errors: [] });
+  res.status(200).json({ success: true, errors: [], model: data as Task[] });
 }

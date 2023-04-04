@@ -18,7 +18,7 @@ export default function NavBar({
           <Link href="/">EITASKS</Link>
         </li>
         <div className="hidden lg:block absolute left-1/2 -translate-x-1/2">
-          <BottomNavigation></BottomNavigation>
+          {/* <BottomNavigation></BottomNavigation> */}
         </div>
         <li className="text-gray-500">
           <button onClick={() => supabase.auth.signOut()}>

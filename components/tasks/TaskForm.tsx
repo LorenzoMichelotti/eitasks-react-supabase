@@ -12,13 +12,13 @@ export default function TaskForm({
   isOpen = true,
   setIsOpen,
   subtaskMode = false,
-  triggerCreating,
+  triggerSubtaskCreated,
 }: {
   parentTaskId?: number;
   isOpen?: boolean;
   setIsOpen?: Dispatch<SetStateAction<boolean>>;
   subtaskMode?: boolean;
-  triggerCreating?: (isSubtask: boolean) => void;
+  triggerSubtaskCreated?: (task: Task) => void;
 }) {
   const [title, setTitle] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -56,7 +56,6 @@ export default function TaskForm({
   }
 
   function createTask(uniqueId: string) {
-    if (triggerCreating) triggerCreating(false);
     if (!profile) {
       toast.error("Profile error");
       return;
@@ -66,7 +65,7 @@ export default function TaskForm({
       progress: 0,
       profileId: profile.id,
     };
-    addTask(newTask, supabase);
+    addTask(newTask, false);
     setTitle("");
   }
 
@@ -92,7 +91,6 @@ export default function TaskForm({
     updateTask(updatedParentTask, supabase);
     // subtask
     console.log("Creating subtask...");
-    if (triggerCreating) triggerCreating(true);
     if (!profile) {
       console.log("Profile error");
       toast.error("Profile error");
@@ -105,32 +103,11 @@ export default function TaskForm({
       profileId: profile.id,
     };
     // update database
-    addTask(subtask, supabase);
+    const newTask = await addTask(subtask, true);
+    if (newTask && triggerSubtaskCreated) triggerSubtaskCreated(newTask);
     setIsOpen && setIsOpen(false);
     setTitle("");
   }
-
-  // function recalculateTaskProgress() {
-  //   // optimistically update the parent task
-  //   if (!parentTaskId) return;
-  //   const updatedTasks = [...tasks];
-  //   console.log("updating parent task");
-  //   const parentTask = tasks.find((t) => t.id === parentTaskId);
-  //   const updatedProgress =
-  //     (updatedSubtasks.filter((t) => t.completed).length * 100) /
-  //     updatedSubtasks.length;
-  //   if (!parentTask) return;
-  //   const updatedParentTask = { ...parentTask };
-  //   updatedParentTask.progress = Math.round(updatedProgress);
-  //   updatedTasks.splice(
-  //     tasks.findIndex((t) => t.id === parentTaskId),
-  //     1,
-  //     updatedParentTask
-  //   );
-  //   setTasks(updatedTasks);
-  //   // update the parent task
-  //   updateTask(updatedParentTask, supabase);
-  // }
 
   const formVariant = {
     closed: { y: -20, opacity: 0, transition: { duration: 0.2 } },

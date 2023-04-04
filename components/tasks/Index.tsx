@@ -1,19 +1,24 @@
 import useTaskStore from "@/hooks/UseTaskStore";
 import { getProfileData } from "@/services/supabaseUtils";
-import { GitHubLogoIcon, LinkedInLogoIcon } from "@radix-ui/react-icons";
+// import {
+//   GitHubLogoIcon,
+//   LinkedInLogoIcon,
+//   MagnifyingGlassIcon,
+// } from "@radix-ui/react-icons";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { Session } from "@supabase/supabase-js";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import BottomNavigation from "../BottomNavigation";
+// import BottomNavigation from "../BottomNavigation";
 import NavBar from "../Navbar";
-import ProjectsList from "./ProjectsPanel/ProjectsList";
+// import ProjectsList from "./ProjectsPanel/ProjectsList";
 import TaskDetails from "./TaskDetailsPanel/TaskDetails";
 import TaskForm from "./TaskForm";
 import TaskList from "./TaskList";
 import { Pagination } from "@nextui-org/react";
-import Task from "../../models/Task";
+// import Task from "../../models/Task";
 import Footer from "../Footer";
+// import DetailsPlaceholder from "./TaskDetailsPanel/DetailsPlaceholder";
 
 export default function Tasks({ session }: { session: Session }) {
   const {
@@ -47,44 +52,13 @@ export default function Tasks({ session }: { session: Session }) {
 
   useEffect(() => {
     if (!profile) return;
-    const insertTasksObserver = supabase
-      .channel("tasks-insert-channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "tasks",
-          filter: `profileId=eq.${profile.id}`,
-        },
-        (payload) => {
-          console.log("Change received!", payload);
-          if (payload.errors || !payload.new) return;
-          const updatedTask = payload.new as Task;
-          if (!updatedTask.parentTaskId && payload.eventType === "INSERT") {
-            console.log("going to page 1.");
-            if (currentPage === 1) loadTasks(profile, supabase, 1, 5);
-            else setCurrentPage(1);
-          } else {
-            console.log("staying on the same page.", currentPage);
-            return loadTasks(profile, supabase, currentPage, 5);
-          }
-        }
-      )
-      .subscribe();
-    return () => {
-      insertTasksObserver.unsubscribe();
-    };
-  }, [profile, currentPage]);
-
-  useEffect(() => {
-    if (!profile) return;
-    console.log("loading tasks because the page number changed");
-    loadTasks(profile, supabase, currentPage, 5);
-  }, [currentPage, profile]);
+    console.log("loading tasks because the profile was loaded");
+    loadTasks(profile, supabase, 1, 5);
+  }, [profile]);
 
   function handleSetPage(page: number) {
-    setCurrentPage(page);
+    if (!profile) return;
+    loadTasks(profile, supabase, page, 5);
   }
 
   const cardVariants = {
@@ -98,10 +72,9 @@ export default function Tasks({ session }: { session: Session }) {
       <div className="relative w-full -mt-8 pt-8">
         <NavBar supabase={supabase} />
         <div className="grid grid-cols-1 pb-4 gap-4 mx-4 lg:grid-cols-2 xl:grid-cols-3">
-          {/* CONTENT CARDS */}
           <AnimatePresence>
             <div className="hidden lg:flex lg:flex-col gap-4">
-              <motion.div
+              {/* <motion.div
                 variants={cardVariants}
                 initial="enter"
                 animate="idle"
@@ -110,7 +83,7 @@ export default function Tasks({ session }: { session: Session }) {
                 className="text-white h-full"
               >
                 <ProjectsList />
-              </motion.div>
+              </motion.div> */}
               {activeTask && (
                 <motion.div
                   variants={cardVariants}
@@ -164,9 +137,9 @@ export default function Tasks({ session }: { session: Session }) {
                   initial={{ backdropFilter: "blur(0px)" }}
                   animate={{ backdropFilter: "blur(16px)" }}
                   exit={{ backdropFilter: "blur(0px)" }}
-                  className="fixed top-1/2 -translate-y-1/2 flex flex-col items-center justify-end w-full h-full px-4 left-0 backdrop-blur-xl"
+                  className="fixed top-1/2 -translate-y-1/2 left-0 flex flex-col items-center justify-end w-full h-full px-4 backdrop-blur-xl"
                 >
-                  <div className="overflow-auto h-full mt-4 rounded-lg">
+                  <div className="overflow-auto h-full w-full md:w-2/3 mt-4 rounded-lg">
                     <TaskDetails />
                   </div>
                   <motion.button
@@ -182,7 +155,7 @@ export default function Tasks({ session }: { session: Session }) {
               )}
             </AnimatePresence>
             <TaskForm></TaskForm>
-            <BottomNavigation></BottomNavigation>
+            {/* <BottomNavigation></BottomNavigation> */}
           </div>
         </div>
         <Footer></Footer>

@@ -29,7 +29,7 @@ export default function TaskCard({
         variants={taskCardVariants}
         key={task.id}
         onClick={handleSetAsActiveTask}
-        className={`w-full cursor-pointer relative flex-col`} //task
+        className={`w-full cursor-pointer relative`} //task
       >
         <AnimatePresence>
           {activeTask?.id === task.id && (

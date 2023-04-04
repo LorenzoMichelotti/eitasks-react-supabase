@@ -1,11 +1,9 @@
 import Profile from "@/models/Profile";
 import Response from "@/models/Response";
 import Task, { CreateTask } from "@/models/Task";
-import { TrashIcon } from "@radix-ui/react-icons";
-// import supabase from "@/services/supabaseClient";
 import { SupabaseClient } from "@supabase/supabase-js";
 import axios, { AxiosError } from "axios";
-import toast, { IconTheme } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { create } from "zustand";
 
 interface TaskState {
@@ -20,10 +18,7 @@ interface TaskState {
     maxPerPage?: number
   ) => void;
   setTasks: (tasks: Task[]) => void;
-  addTask: (
-    task: CreateTask,
-    supabase: SupabaseClient<any, "public", any>
-  ) => void;
+  addTask: (task: CreateTask, isSubtask: boolean) => Promise<Task | void>;
   removeTask: (
     taskId: number,
     profileId: number,
@@ -73,10 +68,14 @@ const useTaskStore = create<TaskState>((set) => ({
       return { ...state, tasks: updatedTasks };
     });
   },
-  addTask: async (
-    task: CreateTask,
-    supabase: SupabaseClient<any, "public", any>
-  ) => createTask(task, supabase),
+  addTask: async (task: CreateTask, isSubtask: boolean) => {
+    const resp = await createTask(task);
+    if (!resp.success || !resp.model) return;
+    const newTask = resp.model[0];
+    if (isSubtask) return newTask;
+    set((state) => ({ ...state, tasks: [newTask, ...state.tasks] }));
+    return newTask;
+  },
   load: async (
     profile: Profile,
     supabase: SupabaseClient<any, "public", any>,
@@ -177,13 +176,11 @@ async function removeTask(
     toast.error("Error deleting task!");
     return;
   }
-  toast.loading("Deleting task...", { id: "delete-task-toast" });
   axios
     .delete(`/api/tasks/delete/${taskId}`)
     .then((response) => {
       const data = response.data;
       if (!data.success) return toast.error(data.errors[0]);
-      toast.success("The task was deleted", { id: "delete-task-toast" });
     })
     .catch((error: AxiosError) => {
       console.log(error?.code + error.message);
@@ -192,13 +189,14 @@ async function removeTask(
   return;
 }
 
-async function createTask(
-  task: CreateTask,
-  supabase: SupabaseClient<any, "public", any>
-) {
-  if (!task)
-    return toast.error("Error creating task!", { id: "create-task-toast" });
-
+async function createTask(task: CreateTask) {
+  if (!task) {
+    toast.error("Error creating task!", { id: "create-task-toast" });
+    return {
+      errors: ["Error creating task!"],
+      success: false,
+    };
+  }
   let newTask: CreateTask = {
     progress: task.progress,
     title: task.title,
@@ -208,14 +206,19 @@ async function createTask(
   if (task.parentTaskId) newTask.parentTaskId = task.parentTaskId;
 
   return axios
-    .post<Response<CreateTask>>(`/api/tasks/post`, newTask)
+    .post<Response<Task[]>>(`/api/tasks/post`, newTask)
     .then((response) => {
       const data = response.data;
-      if (!data.success) return toast.error(data.errors[0]);
+      if (!data.success) toast.error(data.errors[0]);
+      return data;
     })
     .catch((error: AxiosError) => {
       console.log(error?.code + error.message);
       toast.error(error?.code + error.message);
+      return {
+        errors: [error?.code + error.message],
+        success: false,
+      };
     });
 }
 
@@ -234,7 +237,6 @@ async function updateTask(
     })
     .eq("id", task.id);
   if (error) return toast.error("Error updating task!");
-  else console.log("The task was updated.");
 }
 
 async function getSubtasks(

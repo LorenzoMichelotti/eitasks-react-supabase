@@ -109,9 +109,9 @@ export default function TaskReader({
     setCreatingSubtask(false);
   }, [activeTask]);
 
-  function handleCreating(isSubtask: boolean) {
-    if (isSubtask) {
-      setCreatingSubtask(true);
+  function triggerSubtaskCreated(task: Task) {
+    if (task) {
+      setSubtasks((prev) => [task, ...prev]);
     }
   }
 
@@ -135,13 +135,13 @@ export default function TaskReader({
         <div className="flex flex-col w-full">
           {/* subtasks */}
           <TaskForm
-            triggerCreating={handleCreating}
+            triggerSubtaskCreated={triggerSubtaskCreated}
             parentTaskId={activeTask.id}
             subtaskMode={true}
           />
           <div className="flex lg:max-h-[180px] xl:max-h-[360px] overflow-auto flex-col space-y-1 mt-4">
             {subtasks &&
-              subtasks.map((subtask) => (
+              subtasks?.map((subtask) => (
                 <SubtaskCard
                   subtask={subtask}
                   toggleSubtask={toggleSubtask}

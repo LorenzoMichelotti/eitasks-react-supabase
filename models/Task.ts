@@ -3,7 +3,7 @@ export default interface Task {
   created_at?: string;
   completed?: boolean;
   parentTaskId?: number;
-  description: string;
+  description?: string;
   progress: number;
   title: string;
 }
